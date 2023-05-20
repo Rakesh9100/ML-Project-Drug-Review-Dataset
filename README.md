@@ -272,17 +272,7 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
-<h2>Project Admin⚡</h2>
 
-<table>
-<tr>
-<td align="center">
-<a href="https://github.com/Rakesh9100/"><img src="https://avatars.githubusercontent.com/u/73993775?v=4" height="150px" width="150px" alt="Rakesh Roshan"></a><br><sub><b>Rakesh Roshan</b></sub>
-</td>
-</tr>
-</table>
-
-<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <h2>Contributing is fun🧡</h2>
 
