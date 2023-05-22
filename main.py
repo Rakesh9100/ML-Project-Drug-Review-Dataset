@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression, Perceptron
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, plot_confusion_matrix 
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay 
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -82,6 +82,11 @@ test_imp[['day', 'month']] = test_imp[['day', 'month']].astype('int8')
 X_train, Y_train = train_imp.drop('rating', axis=1), train_imp['rating']
 X_test, Y_test = test_imp.drop('rating', axis=1), test_imp['rating']
 
+# print(type(X_train), type(X_test), type(Y_train), type(Y_test))
+
+## assigning features to type 'str' to remove TypeError
+X_train.columns = X_train.columns.astype(str)
+X_test.columns = X_test.columns.astype(str)
 ##### LinearRegression regression algorithm #####
 
 linear=LinearRegression()
@@ -149,15 +154,14 @@ plt.ylabel('Accuracy')
 plt.show()
 
 # Plotting the confusion matrix
-plot_confusion_matrix(logi, X_test, Y_test)
+cm = confusion_matrix(Y_test, logi_test, labels=logi.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title('Logistic Regression Confusion Matrix')
 plt.show()
 
 ##### Perceptron Model classification algorithm #####
-
 perce = Perceptron(max_iter=1000, eta0=0.5)
 perce.fit(X_train, Y_train)
-
 perce_train=perce.predict(X_train)
 perce_test=perce.predict(X_test)
 print("\nPerceptron Metrics:")
@@ -189,7 +193,7 @@ plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.show()
 
-##### Decision Tree regression algorithm #####
+##### Decision Tree Classifier algorithm #####
 
 dt = DecisionTreeClassifier(criterion="entropy", max_depth=5)
 
@@ -223,7 +227,7 @@ plt.title('Decision Tree Classifier - Testing Data Scatter Plot')
 plt.show()
 
 # Plotting the confusion matrix
-cm = confusion_matrix(Y_test, test_pred)
-disp = plot_confusion_matrix(dt, X_test, Y_test, cmap=plt.cm.Blues)
-disp.ax_.set_title('Decision Tree Classifier - Confusion Matrix')
+cm = confusion_matrix(Y_test, test_pred, labels=dt.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(cmap='Blues')
+plt.title('Decision Tree Classifier - Confusion Matrix')
 plt.show()
