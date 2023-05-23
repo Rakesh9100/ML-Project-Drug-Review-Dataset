@@ -12,6 +12,9 @@ from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confus
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, Embedding
+
 ## Reading the data
 dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'category', 'usefulCount': 'int16' }
 train_df = pd.read_csv('datasets/drugsComTrain_raw.tsv', sep='\t', dtype=dtypes)
@@ -82,6 +85,9 @@ test_imp[['day', 'month']] = test_imp[['day', 'month']].astype('int8')
 ## Splitting the train and test datasets into feature variables
 X_train, Y_train = train_imp.drop('rating', axis=1), train_imp['rating']
 X_test, Y_test = test_imp.drop('rating', axis=1), test_imp['rating']
+
+X_train.columns = X_train.columns.astype(str)
+X_test.columns = X_test.columns.astype(str)
 
 ##### LinearRegression regression algorithm #####
 
@@ -230,4 +236,76 @@ plt.show()
 cm = confusion_matrix(Y_test, test_pred, labels=dt.classes_)
 ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(cmap='Blues')
 plt.title('Decision Tree Classifier - Confusion Matrix')
+plt.show()
+
+
+##### Long Short-Term Memory algorithm #####
+
+# Define the model
+model = Sequential()
+model.add(LSTM(32, input_shape=(3006, 1)))
+model.add(Dense(1))
+
+# Reshape the X_train data
+X_train = X_train.values.reshape(129038, 3006, 1)
+
+# Reshape the y_train data
+Y_train = Y_train.values.reshape(129038, 1)
+
+#Reshape the Y_test data
+Y_test = Y_test.values.reshape(53766,1)
+
+#Reshape the X_test data
+X_test = X_test.values.reshape(53766,3006,1)
+
+# Compile the model
+model.compile(loss='mse', optimizer='adam')
+
+# Fit the model
+model.fit(X_train, Y_train, epochs=10)
+
+# Evaluate the model
+model.evaluate(X_test, Y_test)
+
+# Make predictions
+predictions = model.predict(X_test)
+
+mse = np.mean(np.square(predictions - Y_test))
+print("Mean Squared Error (MSE):", mse)
+
+mae = np.mean(np.abs(predictions - Y_test))
+print("Mean Absolute Error (MAE):", mae)
+
+rmse = np.sqrt(mse)
+print("Root Mean Squared Error (RMSE):", rmse)
+
+# Plotting the scatter plot of predicted vs actual values for training data
+
+
+# Make predictions on training data
+train_predictions = model.predict(X_train)
+
+# Reshape the predictions
+train_predictions = train_predictions.reshape(train_predictions.shape[0])
+
+# Create a scatter plot
+plt.scatter(Y_train, train_predictions)
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.title('Scatter Plot: Predicted vs Actual (Training Data)')
+plt.show()
+
+# Plotting the scatter plot of predicted vs actual values for testing data
+
+# Make predictions on testing data
+test_predictions = model.predict(X_test)
+
+# Reshape the predictions
+test_predictions = test_predictions.reshape(test_predictions.shape[0])
+
+# Create a scatter plot
+plt.scatter(Y_test, test_predictions)
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.title('Scatter Plot: Predicted vs Actual (Testing Data)')
 plt.show()
