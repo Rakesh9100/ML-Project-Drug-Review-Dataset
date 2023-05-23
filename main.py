@@ -262,7 +262,7 @@ X_test = X_test.values.reshape(53766,3006,1)
 model.compile(loss='mse', optimizer='adam')
 
 # Fit the model
-model.fit(X_train, Y_train, epochs=2)
+model.fit(X_train, Y_train, epochs=10)
 
 # Evaluate the model
 model.evaluate(X_test, Y_test)
