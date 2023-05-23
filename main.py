@@ -8,13 +8,12 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, plot_confusion_matrix 
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay 
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
-
 
 ## Reading the data
 dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'category', 'usefulCount': 'int16' }
@@ -234,14 +233,13 @@ plt.title('Decision Tree Classifier - Testing Data Scatter Plot')
 plt.show()
 
 # Plotting the confusion matrix
-
-cm = confusion_matrix(Y_test, test_pred)
-disp = plot_confusion_matrix(dt, X_test, Y_test, cmap=plt.cm.Blues)
-disp.ax_.set_title('Decision Tree Classifier - Confusion Matrix')
+cm = confusion_matrix(Y_test, test_pred, labels=dt.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(cmap='Blues')
+plt.title('Decision Tree Classifier - Confusion Matrix')
 plt.show()
 
 
-##### LSTM algorithm #####
+##### Long Short-Term Memory algorithm #####
 
 # Define the model
 model = Sequential()
@@ -264,15 +262,13 @@ X_test = X_test.values.reshape(53766,3006,1)
 model.compile(loss='mse', optimizer='adam')
 
 # Fit the model
-model.fit(X_train, Y_train, epochs=10)
+model.fit(X_train, Y_train, epochs=2)
 
 # Evaluate the model
 model.evaluate(X_test, Y_test)
 
 # Make predictions
 predictions = model.predict(X_test)
-
-
 
 mse = np.mean(np.square(predictions - Y_test))
 print("Mean Squared Error (MSE):", mse)
@@ -313,35 +309,3 @@ plt.xlabel('Actual Values')
 plt.ylabel('Predicted Values')
 plt.title('Scatter Plot: Predicted vs Actual (Testing Data)')
 plt.show()
-
-# Plotting the scatter plot of predicted vs true values for both training and testing sets
-
-# Make predictions on training data
-train_predictions = model.predict(X_train)
-train_predictions = train_predictions.reshape(train_predictions.shape[0])
-
-# Make predictions on testing data
-test_predictions = model.predict(X_test)
-test_predictions = test_predictions.reshape(test_predictions.shape[0])
-
-# Create scatter plot for training data
-plt.scatter(Y_train, train_predictions, label='Training Data')
-plt.xlabel('True Values')
-plt.ylabel('Predicted Values')
-plt.title('Scatter Plot: Predicted vs True (Training Data)')
-plt.legend()
-plt.show()
-
-# Create scatter plot for testing data
-plt.scatter(Y_test, test_predictions, label='Testing Data')
-plt.xlabel('True Values')
-plt.ylabel('Predicted Values')
-plt.title('Scatter Plot: Predicted vs True (Testing Data)')
-plt.legend()
-plt.show()
-
-
-
-
-
-
