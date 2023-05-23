@@ -3,7 +3,22 @@
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <div id="top"></div>
-
+<div align="center">
+<img src="https://forthebadge.com/images/badges/built-with-love.svg" />
+<img src="https://forthebadge.com/images/badges/uses-brains.svg" />
+<img src="https://forthebadge.com/images/badges/powered-by-responsibility.svg" />
+  <br>
+<img src="https://img.shields.io/github/repo-size/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues-closed-raw/Rakesh9100/ML-Project-Drug-Review-Dataset?color=blue&style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues-pr/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues-pr-closed-raw/Rakesh9100/ML-Project-Drug-Review-Dataset?color=green&style=for-the-badge" />
+  <img src="https://img.shields.io/github/license/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/forks/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/stars/Rakesh9100/ML-Project-Drug-Review-Dataset?color=yello&style=for-the-badge" />
+  <img src="https://img.shields.io/github/contributors/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  
+</div>
 <h2>Table of Contents🧾</h2>
 
 - [Introduction📌](#introduction)
