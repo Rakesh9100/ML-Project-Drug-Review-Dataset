@@ -227,3 +227,12 @@ cm = confusion_matrix(Y_test, test_pred)
 disp = plot_confusion_matrix(dt, X_test, Y_test, cmap=plt.cm.Blues)
 disp.ax_.set_title('Decision Tree Classifier - Confusion Matrix')
 plt.show()
+
+
+# PLotting for Categorical graph under Seaborn 
+sns.catplot(x="X_test", y="Y_test", data=df, kind="bar")
+plt.show()
+
+# Plotting for heatmap graph under Seaborn
+sns.heatmap(df, annot=True, cmap="YlGnBu")
+plt.show()
