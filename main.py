@@ -233,7 +233,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 data = pd.read_csv('datasets/drugsComTrain_raw.tsv', sep='\t', dtype=dtypes)
 data['date'] = pd.to_datetime(data['date'])
-X = data[['drugName', 'condition', 'review', 'date', 'usefulcount']]
+X = data[['drugName', 'condition', 'review', 'date', 'usefulCount']]
 Y = data['rating']
 
 def cross_validate(model):
