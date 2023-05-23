@@ -270,6 +270,9 @@ predictions = model.predict(X_test)
 
 
 
+mse = np.mean(np.square(predictions - Y_test))
+print("Mean Squared Error (MSE):", mse)
+
 mae = np.mean(np.abs(predictions - Y_test))
 print("Mean Absolute Error (MAE):", mae)
 
