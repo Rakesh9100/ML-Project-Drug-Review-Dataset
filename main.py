@@ -5,7 +5,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
-from sklearn.linear_model import LinearRegression, LogisticRegression, Perceptron
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, plot_confusion_matrix 
 import seaborn as sns
@@ -156,47 +157,50 @@ plt.ylabel('Accuracy')
 plt.show()
 
 # Plotting the confusion matrix
-plot_confusion_matrix(logi, X_test, Y_test)
+cm = confusion_matrix(Y_test, logi_test, labels=logi.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title('Logistic Regression Confusion Matrix')
 plt.show()
 
+
 ##### Perceptron Model classification algorithm #####
 
-perce = Perceptron(max_iter=1000, eta0=0.5)
-perce.fit(X_train, Y_train)
 
-perce_train=perce.predict(X_train)
-perce_test=perce.predict(X_test)
-print("\nPerceptron Metrics:")
-print("Accuracy for training ",accuracy_score(perce_train, Y_train))
-print("Accuracy for testing ",accuracy_score(perce_test, Y_test))
+mlpcls = MLPClassifier(hidden_layer_sizes=(30,30),activation="relu",random_state=1,max_iter=300).fit(X_train, Y_train)
+
+mlpcls_train=mlpcls.predict(X_train)
+mlpcls_test=mlpcls.predict(X_test)
+print("\nMulti Layer Perceptron Metrics:")
+print("Accuracy for training ",accuracy_score(mlpcls_train,Y_train))
+print("Accuracy for testing ",accuracy_score(mlpcls_test,Y_test))
+
 
 # Plotting the scatter plot of actual vs predicted values
-plt.scatter(Y_test, perce_test, color='blue', label='Predicted Ratings')
+plt.scatter(Y_test, mlpcls_test, color='blue', label='Predicted Ratings')
 plt.scatter(Y_test, Y_test, color='red', label='Actual Ratings')
-plt.title('Scatter Plot -- Actual vs Predicted values for Perceptron Model')
+plt.title('Scatter Plot -- Actual vs Predicted values for Multi Layer Perceptron Model')
 plt.xlabel('Actual Ratings')
 plt.ylabel('Predicted Ratings')
 plt.legend()
 plt.show()
 
 # Plotting the step plot of accuracy
-plt.step([0, 1], [accuracy_score(perce_train, Y_train), accuracy_score(perce_test, Y_test)], where='post')
-plt.title('Step Plot -- Accuracy for Perceptron Model')
+plt.step([0, 1], [accuracy_score(mlpcls_train, Y_train), accuracy_score(mlpcls_test, Y_test)], where='post')
+plt.title('Step Plot -- Accuracy for Multi Layer Perceptron Model')
 plt.xticks([0, 1], ['Training', 'Testing'])
 plt.ylabel('Accuracy')
 plt.ylim([0, 1])
 plt.show()
 
 # Plotting the Confusion matrix
-cm = confusion_matrix(Y_test, perce_test)
+cm = confusion_matrix(Y_test, mlpcls_test)
 sns.heatmap(cm, annot=True, cmap='Blues')
-plt.title('Perceptron - Confusion Matrix')
+plt.title('MultilayerPerceptron - Confusion Matrix')
 plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.show()
 
-##### Decision Tree regression algorithm #####
+##### Decision Tree Classifier algorithm #####
 
 dt = DecisionTreeClassifier(criterion="entropy", max_depth=5)
 
@@ -230,11 +234,11 @@ plt.title('Decision Tree Classifier - Testing Data Scatter Plot')
 plt.show()
 
 # Plotting the confusion matrix
+
 cm = confusion_matrix(Y_test, test_pred)
 disp = plot_confusion_matrix(dt, X_test, Y_test, cmap=plt.cm.Blues)
 disp.ax_.set_title('Decision Tree Classifier - Confusion Matrix')
 plt.show()
-
 
 
 ##### LSTM algorithm #####
@@ -335,6 +339,8 @@ plt.ylabel('Predicted Values')
 plt.title('Scatter Plot: Predicted vs True (Testing Data)')
 plt.legend()
 plt.show()
+
+
 
 
 
