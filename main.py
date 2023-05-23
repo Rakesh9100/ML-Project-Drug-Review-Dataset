@@ -156,18 +156,18 @@ plt.show()
 
 ##### Perceptron Model classification algorithm #####
 
-mlpcls = MLPClassifier(hidden_layer_sizes=(64,64,64),activation="relu",random_state=1,max_iter=2000).fit(X_train, Y_train)
+mlpcls = MLPClassifier(hidden_layer_sizes=(30,30),activation="relu",random_state=1,max_iter=300).fit(X_train, Y_train)
 
 mlpcls_train=mlpcls.predict(X_train)
 mlpcls_test=mlpcls.predict(X_test)
-print("\nPerceptron Metrics:")
-print("Accuracy for training ",accuracy_score(mlpcls_train, mlpcls_train))
-print("Accuracy for testing ",accuracy_score(mlpcls_test, mlpcls_test))
+print("\nMulti Layer Perceptron Metrics:")
+print("Accuracy for training ",accuracy_score(mlpcls_train,Y_train))
+print("Accuracy for testing ",accuracy_score(mlpcls_test,Y_test))
 
 # Plotting the scatter plot of actual vs predicted values
 plt.scatter(Y_test, mlpcls_test, color='blue', label='Predicted Ratings')
 plt.scatter(Y_test, Y_test, color='red', label='Actual Ratings')
-plt.title('Scatter Plot -- Actual vs Predicted values for Perceptron Model')
+plt.title('Scatter Plot -- Actual vs Predicted values for Multi Layer Perceptron Model')
 plt.xlabel('Actual Ratings')
 plt.ylabel('Predicted Ratings')
 plt.legend()
@@ -175,7 +175,7 @@ plt.show()
 
 # Plotting the step plot of accuracy
 plt.step([0, 1], [accuracy_score(mlpcls_train, Y_train), accuracy_score(mlpcls_test, Y_test)], where='post')
-plt.title('Step Plot -- Accuracy for Perceptron Model')
+plt.title('Step Plot -- Accuracy for Multi Layer Perceptron Model')
 plt.xticks([0, 1], ['Training', 'Testing'])
 plt.ylabel('Accuracy')
 plt.ylim([0, 1])
