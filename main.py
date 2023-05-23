@@ -227,3 +227,28 @@ cm = confusion_matrix(Y_test, test_pred)
 disp = plot_confusion_matrix(dt, X_test, Y_test, cmap=plt.cm.Blues)
 disp.ax_.set_title('Decision Tree Classifier - Confusion Matrix')
 plt.show()
+
+#Function for Cross Validation Tecnhiques--->
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split
+data = pd.read_csv('datasets/drugsComTrain_raw.tsv', sep='\t', dtype=dtypes)
+data['date'] = pd.to_datetime(data['date'])
+X = data[['drugName', 'condition', 'review', 'date', 'usefulcount']]
+Y = data['rating']
+
+def cross_validate(model):
+  # Split the data into training and testing sets
+  X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.25)
+
+  # Calculate the cross validation scores
+  scores = cross_val_score(model, X_train, Y_train, cv=5)
+
+  # Return the cross validation scores
+  return scores
+
+#Cross validating each model present in the program as of now,
+model_list = [dt,perce,logi,linear]
+for model in model_list:
+  scores = cross_validate(model)
+  print(f"Model : {model.__class__.__name__} : Score : {scores}")
+
