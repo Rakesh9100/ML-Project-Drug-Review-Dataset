@@ -301,7 +301,6 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 <h2>Contributing is fun🧡</h2>
 
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 <h3>Contributions of any kind from anyone are always welcome🌟!!</h3>
 <h3>Give it a 🌟 if you ❤ this project. Happy Coding👨‍💻</h3>
 <p align="right">(<a href="#top">back to top</a>)</p>
