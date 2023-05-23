@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, plot_confusion_matrix 
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay 
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -82,6 +82,7 @@ test_imp[['day', 'month']] = test_imp[['day', 'month']].astype('int8')
 ## Splitting the train and test datasets into feature variables
 X_train, Y_train = train_imp.drop('rating', axis=1), train_imp['rating']
 X_test, Y_test = test_imp.drop('rating', axis=1), test_imp['rating']
+
 ##### LinearRegression regression algorithm #####
 
 linear=LinearRegression()
@@ -149,12 +150,14 @@ plt.ylabel('Accuracy')
 plt.show()
 
 # Plotting the confusion matrix
-plot_confusion_matrix(logi, X_test, Y_test)
+cm = confusion_matrix(Y_test, logi_test, labels=logi.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title('Logistic Regression Confusion Matrix')
 plt.show()
 
 
 ##### Perceptron Model classification algorithm #####
+
 
 mlpcls = MLPClassifier(hidden_layer_sizes=(30,30),activation="relu",random_state=1,max_iter=300).fit(X_train, Y_train)
 
@@ -163,6 +166,7 @@ mlpcls_test=mlpcls.predict(X_test)
 print("\nMulti Layer Perceptron Metrics:")
 print("Accuracy for training ",accuracy_score(mlpcls_train,Y_train))
 print("Accuracy for testing ",accuracy_score(mlpcls_test,Y_test))
+
 
 # Plotting the scatter plot of actual vs predicted values
 plt.scatter(Y_test, mlpcls_test, color='blue', label='Predicted Ratings')
@@ -189,7 +193,7 @@ plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.show()
 
-##### Decision Tree regression algorithm #####
+##### Decision Tree Classifier algorithm #####
 
 dt = DecisionTreeClassifier(criterion="entropy", max_depth=5)
 
@@ -223,7 +227,7 @@ plt.title('Decision Tree Classifier - Testing Data Scatter Plot')
 plt.show()
 
 # Plotting the confusion matrix
-cm = confusion_matrix(Y_test, test_pred)
-disp = plot_confusion_matrix(dt, X_test, Y_test, cmap=plt.cm.Blues)
-disp.ax_.set_title('Decision Tree Classifier - Confusion Matrix')
+cm = confusion_matrix(Y_test, test_pred, labels=dt.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(cmap='Blues')
+plt.title('Decision Tree Classifier - Confusion Matrix')
 plt.show()
