@@ -82,6 +82,52 @@ X_train, Y_train = train_imp.drop('rating', axis=1), train_imp['rating']
 X_test, Y_test = test_imp.drop('rating', axis=1), test_imp['rating']
 
 
+##### LinearRegression regression algorithm #####
+
+linear=LinearRegression()
+linear.fit(X_train, Y_train)
+line_train=linear.predict(X_train)
+line_test=linear.predict(X_test)
+
+print("Linear Regression Metrics:")
+print("MSE for training: ", mean_squared_error(Y_train, line_train))
+print("MSE for testing: ", mean_squared_error(Y_test, line_test))
+print("R2 score for training: ", r2_score(Y_train, line_train))
+print("R2 score for testing: ", r2_score(Y_test, line_test))
+
+# Plotting the scatter plot of predicted vs actual values for training data
+plt.scatter(Y_train, line_train)
+plt.xlabel('Actual Ratings')
+plt.ylabel('Predicted Ratings')
+plt.title('Linear Regression - Training Data Scatter Plot')
+plt.show()
+
+# Plotting the scatter plot of predicted vs actual values for testing data
+plt.scatter(Y_test, line_test)
+plt.xlabel('Actual Ratings')
+plt.ylabel('Predicted Ratings')
+plt.title('Linear Regression - Testing Data Scatter Plot')
+plt.show()
+
+# Plotting the scatter plot of predicted vs true values for both training and testing sets
+plt.figure(figsize=(8,6))
+plt.scatter(Y_train, line_train, alpha=0.3, label='Training')
+plt.scatter(Y_test, line_test, alpha=0.3, label='Testing')
+plt.plot([0,10], [0,10], linestyle='--', color='k', label='Perfect prediction')
+plt.xlabel('True Ratings')
+plt.ylabel('Predicted Ratings')
+plt.title('Linear regression - Training and Testing Sets Scatter Plot')
+plt.legend()
+plt.show()
+
+# Plotting the residual plot for testing data
+plt.scatter(line_test, line_test - Y_test, c='g', s=40, alpha=0.5)
+plt.hlines(y=0, xmin=0, xmax=10)
+plt.xlabel('Predicted Ratings')
+plt.ylabel('Residuals')
+plt.title('Linear Regression - Testing Data Residual Plot')
+plt.show()
+
 ##### Randomized Random Forest Regression algorithm #####
 
 param = [
@@ -133,52 +179,6 @@ plt.hlines(y=0, xmin=0, xmax=10)
 plt.xlabel('Predicted Ratings')
 plt.ylabel('Residuals')
 plt.title('Randomized RandomForestRegressor - Testing Data Residual Plot')
-plt.show()
-
-##### LinearRegression regression algorithm #####
-
-linear=LinearRegression()
-linear.fit(X_train, Y_train)
-line_train=linear.predict(X_train)
-line_test=linear.predict(X_test)
-
-print("Linear Regression Metrics:")
-print("MSE for training: ", mean_squared_error(Y_train, line_train))
-print("MSE for testing: ", mean_squared_error(Y_test, line_test))
-print("R2 score for training: ", r2_score(Y_train, line_train))
-print("R2 score for testing: ", r2_score(Y_test, line_test))
-
-# Plotting the scatter plot of predicted vs actual values for training data
-plt.scatter(Y_train, line_train)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('Linear Regression - Training Data Scatter Plot')
-plt.show()
-
-# Plotting the scatter plot of predicted vs actual values for testing data
-plt.scatter(Y_test, line_test)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('Linear Regression - Testing Data Scatter Plot')
-plt.show()
-
-# Plotting the scatter plot of predicted vs true values for both training and testing sets
-plt.figure(figsize=(8,6))
-plt.scatter(Y_train, line_train, alpha=0.3, label='Training')
-plt.scatter(Y_test, line_test, alpha=0.3, label='Testing')
-plt.plot([0,10], [0,10], linestyle='--', color='k', label='Perfect prediction')
-plt.xlabel('True Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('Linear regression - Training and Testing Sets Scatter Plot')
-plt.legend()
-plt.show()
-
-# Plotting the residual plot for testing data
-plt.scatter(line_test, line_test - Y_test, c='g', s=40, alpha=0.5)
-plt.hlines(y=0, xmin=0, xmax=10)
-plt.xlabel('Predicted Ratings')
-plt.ylabel('Residuals')
-plt.title('Linear Regression - Testing Data Residual Plot')
 plt.show()
 
 ##### LogisticRegression classification algorithm #####
