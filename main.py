@@ -1,4 +1,5 @@
 import pandas as pd, numpy as np
+import csv
 import warnings
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from sklearn.impute import SimpleImputer
@@ -8,24 +9,20 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression, Perceptron
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay 
-from sklearn.model_selection import RandomizedSearchCV
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+## Reading the data
 train_url = 'https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/raw/main/datasets/drugsComTrain_raw.tsv'
 test_url = 'https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/raw/main/datasets/drugsComTest_raw.tsv'
 
-## Reading the data
-dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'category', 'usefulCount': 'int16' }
-train_df = pd.read_csv(train_url, sep='\t', dtype=dtypes)
-# Randomly selecting 80% of the data from the training dataset
-train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv(test_url, sep='\t', dtype=dtypes)
+dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'string', 'usefulCount': 'int16' }
+train_df = pd.read_csv(train_url, sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
 
-print(train_df.head())
-## Converting date column to datetime format
-train_df['date'], test_df['date'] = pd.to_datetime(train_df['date'], format='%B %d, %Y'), pd.to_datetime(test_df['date'], format='%B %d, %Y')
+train_df = train_df.sample(frac=0.5, random_state=42)
+test_df = pd.read_csv(test_url, sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
 
 ## Extracting day, month, and year into separate columns
 for df in [train_df, test_df]:
@@ -49,12 +46,8 @@ train_df['review'], test_df['review'] = train_df['review'].apply(decode_html), t
 ## Dropped the original date column and removed the useless column
 train_df, test_df = [df.drop('date', axis=1).drop(df.columns[0], axis=1) for df in (train_df, test_df)]
 
-## Handling the missing values
-train_imp, test_imp = [pd.DataFrame(SimpleImputer(strategy='most_frequent').fit_transform(df)) for df in (train_df, test_df)]
-
-## Assigning old column names
-train_imp.columns = ['drugName', 'condition', 'review', 'rating', 'usefulCount', 'day', 'month', 'year']
-test_imp.columns = ['drugName', 'condition', 'review', 'rating', 'usefulCount', 'day', 'month', 'year']
+## Handling the missing values and assigning old column names
+train_imp, test_imp = [pd.DataFrame(SimpleImputer(strategy='most_frequent').fit_transform(df), columns=df.columns) for df in (train_df, test_df)]
 
 ## Converting the text in the review column to numerical data
 vectorizer = TfidfVectorizer(stop_words='english', max_features=3000)
@@ -141,7 +134,6 @@ plt.xlabel('Predicted Ratings')
 plt.ylabel('Residuals')
 plt.title('Randomized RandomForestRegressor - Testing Data Residual Plot')
 plt.show()
-
 
 ##### LinearRegression regression algorithm #####
 
