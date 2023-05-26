@@ -1,5 +1,4 @@
-import pandas as pd, numpy as np
-import csv
+import pandas as pd, numpy as np  
 import warnings
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from sklearn.impute import SimpleImputer
@@ -15,14 +14,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 ## Reading the data
-train_url = 'https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/raw/main/datasets/drugsComTrain_raw.tsv'
-test_url = 'https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/raw/main/datasets/drugsComTest_raw.tsv'
-
 dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'string', 'usefulCount': 'int16' }
-train_df = pd.read_csv(train_url, sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
+train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
 
 train_df = train_df.sample(frac=0.5, random_state=42)
-test_df = pd.read_csv(test_url, sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
+test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
 
 ## Extracting day, month, and year into separate columns
 for df in [train_df, test_df]:
