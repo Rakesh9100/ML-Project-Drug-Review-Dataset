@@ -215,6 +215,42 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title('Logistic Regression Confusion Matrix')
 plt.show()
 
+#### Support Vector Machine Algorithm #####
+svm = SVC()
+svm.fit(X_train, Y_train)
+svm_train_prediction = svm.predict(X_train)
+svm_test_prediction = svm.predict(X_test)
+
+svm_train_accuracy = accuracy_score(svm_train_prediction, Y_train)
+svm_test_accuracy = accuracy_score(svm_test_prediction, Y_test)
+print("\nSVM Metrics:")
+print("Accuracy for training: ", svm_train_accuracy)
+print("Accuracy for testing: ", svm_test_accuracy)
+
+# Plotting the confusion matrix
+svm_cm = confusion_matrix(Y_test, svm_test_prediction, labels=svm.classes_)
+ConfusionMatrixDisplay(confusion_matrix=svm_cm, display_labels=svm.classes_).plot()
+plt.title('Support Vector Machine Confusion Matrix')
+plt.show()
+
+
+#### KNearest Neighbour Algorithm #####
+knn = KNeighborsClassifier(n_neighbors=10)
+knn.fit(X_train, Y_train)
+knn_train_prediction = knn.predict(X_train)
+knn_test_prediction = knn.predict(X_test)
+
+knn_train_accuracy = accuracy_score(knn_train_prediction, Y_train)
+knn_test_accuracy = accuracy_score(knn_test_prediction, Y_test)
+print("\nKNearest Neighbour Metrics:")
+print("Accuracy for training: ", knn_train_accuracy)
+print("Accuracy for testing: ", knn_test_accuracy)
+
+# Plotting the confusion matrix
+knn_cm = confusion_matrix(Y_test, knn_test_prediction, labels=knn.classes_)
+ConfusionMatrixDisplay(confusion_matrix=knn_cm, display_labels=knn.classes_).plot()
+plt.title('Random Forest Confusion Matrix')
+plt.show()
 
 ##### Perceptron Model classification algorithm #####
 
