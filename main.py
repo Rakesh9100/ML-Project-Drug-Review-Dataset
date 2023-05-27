@@ -1,4 +1,4 @@
-import pandas as pd, numpy as np
+import pandas as pd, numpy as np  
 import warnings
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from sklearn.impute import SimpleImputer
@@ -9,6 +9,8 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay 
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -16,11 +18,11 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
 
 ## Reading the data
-dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'category', 'usefulCount': 'int16' }
-train_df = pd.read_csv('datasets/drugsComTrain_raw.tsv', sep='\t', dtype=dtypes)
-# Randomly selecting 80% of the data from the training dataset
+dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'string', 'usefulCount': 'int16' }
+train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep='\t', quoting=2, dtype=dtypes)
+
 train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv('datasets/drugsComTest_raw.tsv', sep='\t', dtype=dtypes)
+test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep='\t', quoting=2, dtype=dtypes)
 
 ## Converting date column to datetime format
 train_df['date'], test_df['date'] = pd.to_datetime(train_df['date'], format='%B %d, %Y'), pd.to_datetime(test_df['date'], format='%B %d, %Y')
@@ -47,8 +49,8 @@ train_df['review'], test_df['review'] = train_df['review'].apply(decode_html), t
 ## Dropped the original date column and removed the useless column
 train_df, test_df = [df.drop('date', axis=1).drop(df.columns[0], axis=1) for df in (train_df, test_df)]
 
-## Handling the missing values
-train_imp, test_imp = [pd.DataFrame(SimpleImputer(strategy='most_frequent').fit_transform(df)) for df in (train_df, test_df)]
+## Handling the missing values and assigning old column names
+train_imp, test_imp = [pd.DataFrame(SimpleImputer(strategy='most_frequent').fit_transform(df), columns=df.columns) for df in (train_df, test_df)]
 
 ## Assigning old column names
 train_imp.columns = ['drugName', 'condition', 'review', 'rating', 'usefulCount', 'day', 'month', 'year']
@@ -62,8 +64,8 @@ test_reviews = vectorizer.transform(test_imp['review'])
 ## Replacing the review column with the numerical data
 train_imp.drop('review', axis=1, inplace=True)
 test_imp.drop('review', axis=1, inplace=True)
-train_imp = pd.concat([train_imp, pd.DataFrame(train_reviews.toarray())], axis=1)
-test_imp = pd.concat([test_imp, pd.DataFrame(test_reviews.toarray())], axis=1)
+train_imp = pd.concat([train_imp, pd.DataFrame(train_reviews.toarray()).add_prefix('review')], axis=1)
+test_imp = pd.concat([test_imp, pd.DataFrame(test_reviews.toarray()).add_prefix('review')], axis=1)
 
 ## Encoding the categorical columns
 for i in ["drugName", "condition"]:
@@ -90,7 +92,6 @@ X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
 
 ##### LinearRegression regression algorithm #####
-
 linear=LinearRegression()
 linear.fit(X_train, Y_train)
 line_train=linear.predict(X_train)
@@ -133,6 +134,59 @@ plt.hlines(y=0, xmin=0, xmax=10)
 plt.xlabel('Predicted Ratings')
 plt.ylabel('Residuals')
 plt.title('Linear Regression - Testing Data Residual Plot')
+plt.show()
+
+##### Randomized Random Forest Regression algorithm #####
+
+param = [
+    {'n_estimators': [100, 200, 300], 
+     'max_depth': [3, 4, 6], 
+     'max_leaf_nodes': [15, 20, 25]}, 
+]
+
+rf = RandomForestRegressor()
+rs_rf = RandomizedSearchCV(rf, param, cv=2, n_jobs=-1, verbose=1)
+rs_rf.fit(X_train, Y_train)
+rs_rf_train = rs_rf.predict(X_train)
+rs_rf_test = rs_rf.predict(X_test)
+
+print("Randomized RandomForestRegressor Metrics:")
+print("MSE for training: ", mean_squared_error(Y_train, rs_rf_train))
+print("MSE for testing: ", mean_squared_error(Y_test, rs_rf_test))
+print("R2 score for training: ", r2_score(Y_train, rs_rf_train))
+print("R2 score for testing: ", r2_score(Y_test, rs_rf_test))
+
+# Plotting the scatter plot of predicted vs actual values for training data
+plt.scatter(Y_train, rs_rf_train)
+plt.xlabel('Actual Ratings')
+plt.ylabel('Predicted Ratings')
+plt.title('Randomized RandomForestRegressor - Training Data Scatter Plot')
+plt.show()
+
+# Plotting the scatter plot of predicted vs actual values for testing data
+plt.scatter(Y_test, rs_rf_test)
+plt.xlabel('Actual Ratings')
+plt.ylabel('Predicted Ratings')
+plt.title('Randomized RandomForestRegressor - Testing Data Scatter Plot')
+plt.show()
+
+# Plotting the scatter plot of predicted vs true values for both training and testing sets
+plt.figure(figsize=(8,6))
+plt.scatter(Y_train, rs_rf_train, alpha=0.3, label='Training')
+plt.scatter(Y_test, rs_rf_test, alpha=0.3, label='Testing')
+plt.plot([0,10], [0,10], linestyle='--', color='k', label='Perfect prediction')
+plt.xlabel('True Ratings')
+plt.ylabel('Predicted Ratings')
+plt.title('Randomized RandomForestRegressor - Training and Testing Sets Scatter Plot')
+plt.legend()
+plt.show()
+
+# Plotting the residual plot for testing data
+plt.scatter(rs_rf_test, rs_rf_test - Y_test, c='g', s=40, alpha=0.5)
+plt.hlines(y=0, xmin=0, xmax=10)
+plt.xlabel('Predicted Ratings')
+plt.ylabel('Residuals')
+plt.title('Randomized RandomForestRegressor - Testing Data Residual Plot')
 plt.show()
 
 ##### LogisticRegression classification algorithm #####
