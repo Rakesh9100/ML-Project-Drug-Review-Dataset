@@ -5,13 +5,17 @@ from sklearn.impute import SimpleImputer
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
-from sklearn.linear_model import LinearRegression, LogisticRegression, Perceptron
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, Embedding
 
 ## Reading the data
 dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'string', 'usefulCount': 'int16' }
@@ -206,47 +210,50 @@ plt.ylabel('Accuracy')
 plt.show()
 
 # Plotting the confusion matrix
-ConfusionMatrixDisplay.from_estimator(logi, X_test, Y_test)
+cm = confusion_matrix(Y_test, logi_test, labels=logi.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title('Logistic Regression Confusion Matrix')
 plt.show()
 
+
 ##### Perceptron Model classification algorithm #####
 
-perce = Perceptron(max_iter=1000, eta0=0.5)
-perce.fit(X_train, Y_train)
 
-perce_train=perce.predict(X_train)
-perce_test=perce.predict(X_test)
-print("\nPerceptron Metrics:")
-print("Accuracy for training ",accuracy_score(perce_train, Y_train))
-print("Accuracy for testing ",accuracy_score(perce_test, Y_test))
+mlpcls = MLPClassifier(hidden_layer_sizes=(30,30),activation="relu",random_state=1,max_iter=300).fit(X_train, Y_train)
+
+mlpcls_train=mlpcls.predict(X_train)
+mlpcls_test=mlpcls.predict(X_test)
+print("\nMulti Layer Perceptron Metrics:")
+print("Accuracy for training ",accuracy_score(mlpcls_train,Y_train))
+print("Accuracy for testing ",accuracy_score(mlpcls_test,Y_test))
+
 
 # Plotting the scatter plot of actual vs predicted values
-plt.scatter(Y_test, perce_test, color='blue', label='Predicted Ratings')
+plt.scatter(Y_test, mlpcls_test, color='blue', label='Predicted Ratings')
 plt.scatter(Y_test, Y_test, color='red', label='Actual Ratings')
-plt.title('Scatter Plot -- Actual vs Predicted values for Perceptron Model')
+plt.title('Scatter Plot -- Actual vs Predicted values for Multi Layer Perceptron Model')
 plt.xlabel('Actual Ratings')
 plt.ylabel('Predicted Ratings')
 plt.legend()
 plt.show()
 
 # Plotting the step plot of accuracy
-plt.step([0, 1], [accuracy_score(perce_train, Y_train), accuracy_score(perce_test, Y_test)], where='post')
-plt.title('Step Plot -- Accuracy for Perceptron Model')
+plt.step([0, 1], [accuracy_score(mlpcls_train, Y_train), accuracy_score(mlpcls_test, Y_test)], where='post')
+plt.title('Step Plot -- Accuracy for Multi Layer Perceptron Model')
 plt.xticks([0, 1], ['Training', 'Testing'])
 plt.ylabel('Accuracy')
 plt.ylim([0, 1])
 plt.show()
 
 # Plotting the Confusion matrix
-cm = confusion_matrix(Y_test, perce_test)
+cm = confusion_matrix(Y_test, mlpcls_test)
 sns.heatmap(cm, annot=True, cmap='Blues')
-plt.title('Perceptron - Confusion Matrix')
+plt.title('MultilayerPerceptron - Confusion Matrix')
 plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.show()
 
-##### Decision Tree regression algorithm #####
+##### Decision Tree Classifier algorithm #####
 
 dt = DecisionTreeClassifier(criterion="entropy", max_depth=5)
 
@@ -280,7 +287,79 @@ plt.title('Decision Tree Classifier - Testing Data Scatter Plot')
 plt.show()
 
 # Plotting the confusion matrix
-cm = confusion_matrix(Y_test, test_pred)
-disp = ConfusionMatrixDisplay.from_estimator(dt, X_test, Y_test, cmap=plt.cm.Blues)
-disp.ax_.set_title('Decision Tree Classifier - Confusion Matrix')
+cm = confusion_matrix(Y_test, test_pred, labels=dt.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(cmap='Blues')
+plt.title('Decision Tree Classifier - Confusion Matrix')
+plt.show()
+
+
+##### Long Short-Term Memory algorithm #####
+
+# Define the model
+model = Sequential()
+model.add(LSTM(32, input_shape=(3006, 1)))
+model.add(Dense(1))
+
+# Reshape the X_train data
+X_train = X_train.values.reshape(129038, 3006, 1)
+
+# Reshape the y_train data
+Y_train = Y_train.values.reshape(129038, 1)
+
+#Reshape the Y_test data
+Y_test = Y_test.values.reshape(53766,1)
+
+#Reshape the X_test data
+X_test = X_test.values.reshape(53766,3006,1)
+
+# Compile the model
+model.compile(loss='mse', optimizer='adam')
+
+# Fit the model
+model.fit(X_train, Y_train, epochs=10)
+
+# Evaluate the model
+model.evaluate(X_test, Y_test)
+
+# Make predictions
+predictions = model.predict(X_test)
+
+mse = np.mean(np.square(predictions - Y_test))
+print("Mean Squared Error (MSE):", mse)
+
+mae = np.mean(np.abs(predictions - Y_test))
+print("Mean Absolute Error (MAE):", mae)
+
+rmse = np.sqrt(mse)
+print("Root Mean Squared Error (RMSE):", rmse)
+
+# Plotting the scatter plot of predicted vs actual values for training data
+
+
+# Make predictions on training data
+train_predictions = model.predict(X_train)
+
+# Reshape the predictions
+train_predictions = train_predictions.reshape(train_predictions.shape[0])
+
+# Create a scatter plot
+plt.scatter(Y_train, train_predictions)
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.title('Scatter Plot: Predicted vs Actual (Training Data)')
+plt.show()
+
+# Plotting the scatter plot of predicted vs actual values for testing data
+
+# Make predictions on testing data
+test_predictions = model.predict(X_test)
+
+# Reshape the predictions
+test_predictions = test_predictions.reshape(test_predictions.shape[0])
+
+# Create a scatter plot
+plt.scatter(Y_test, test_predictions)
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.title('Scatter Plot: Predicted vs Actual (Testing Data)')
 plt.show()
