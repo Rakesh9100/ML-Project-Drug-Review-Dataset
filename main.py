@@ -88,7 +88,6 @@ X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
 
 ##### LinearRegression regression algorithm #####
-
 linear=LinearRegression()
 linear.fit(X_train, Y_train)
 line_train=linear.predict(X_train)
