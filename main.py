@@ -15,10 +15,13 @@ import matplotlib.pyplot as plt
 
 ## Reading the data
 dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'string', 'usefulCount': 'int16' }
-train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
+train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep='\t', quoting=2, dtype=dtypes)
 
-train_df = train_df.sample(frac=0.5, random_state=42)
-test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep='\t', quoting=2, dtype=dtypes, parse_dates=['date'])
+train_df = train_df.sample(frac=0.8, random_state=42)
+test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep='\t', quoting=2, dtype=dtypes)
+
+## Converting date column to datetime format
+train_df['date'], test_df['date'] = pd.to_datetime(train_df['date'], format='%B %d, %Y'), pd.to_datetime(test_df['date'], format='%B %d, %Y')
 
 ## Extracting day, month, and year into separate columns
 for df in [train_df, test_df]:
@@ -44,6 +47,10 @@ train_df, test_df = [df.drop('date', axis=1).drop(df.columns[0], axis=1) for df 
 
 ## Handling the missing values and assigning old column names
 train_imp, test_imp = [pd.DataFrame(SimpleImputer(strategy='most_frequent').fit_transform(df), columns=df.columns) for df in (train_df, test_df)]
+
+## Assigning old column names
+train_imp.columns = ['drugName', 'condition', 'review', 'rating', 'usefulCount', 'day', 'month', 'year']
+test_imp.columns = ['drugName', 'condition', 'review', 'rating', 'usefulCount', 'day', 'month', 'year']
 
 ## Converting the text in the review column to numerical data
 vectorizer = TfidfVectorizer(stop_words='english', max_features=3000)
@@ -77,6 +84,8 @@ test_imp[['day', 'month']] = test_imp[['day', 'month']].astype('int8')
 X_train, Y_train = train_imp.drop('rating', axis=1), train_imp['rating']
 X_test, Y_test = test_imp.drop('rating', axis=1), test_imp['rating']
 
+X_train.columns = X_train.columns.astype(str)
+X_test.columns = X_test.columns.astype(str)
 
 ##### LinearRegression regression algorithm #####
 
