@@ -19,7 +19,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from imblearn.over_sampling import RandomOverSampler
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
 
@@ -34,12 +35,12 @@ dtypes = {
     "usefulCount": "int16",
 }
 train_df = pd.read_csv(
-    r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+    r"C:\\Users\\harsh\\Desktop\\ML Projects\\GSSOC\\datasets\\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
 )
 
 train_df = train_df.sample(frac=0.8, random_state=42)
 test_df = pd.read_csv(
-    r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+    r"C:\\Users\\harsh\\Desktop\\ML Projects\\GSSOC\\datasets\\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
 )
 
 ## Converting date column to datetime format
@@ -147,6 +148,58 @@ X_test, Y_test = test_imp.drop("rating", axis=1), test_imp["rating"]
 
 X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
+
+##### EDA
+
+##### 1) Summary and Stats
+
+# a) Checking Null Values
+
+print("Null Values in Train Data:\n", X_train.isnull().sum())
+print("Null Values in Test Data:\n", X_test.isnull().sum())
+
+# b) Checking the shape of the data
+
+print("Shape of Train Data:", X_train.shape)
+print("Shape of Test Data:", X_test.shape)
+
+# c) Zero Counts
+
+print("Zero Counts in Train Data:\n", (X_train == 0).sum())
+print("Zero Counts in Test Data:\n", (X_test == 0).sum())
+
+##### 2) Visualizations
+
+# a) Box Plot
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x="rating", data=train_imp)
+plt.title("Box Plot of Rating")
+plt.show()
+
+# b) Class Imbalance
+
+plt.figure(figsize=(10, 6))
+sns.countplot(x="rating", data=train_imp)
+plt.title("Class Imbalance of Rating")
+plt.show()
+
+### Over Sampling to handle Class Imbalance
+
+ros = RandomOverSampler(random_state=0)
+X_train, Y_train = ros.fit_resample(X_train, Y_train)
+plt.hist(Y_train, bins=10)
+plt.xlabel("Class")
+plt.ylabel("Count")
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(x="rating", data=train_imp)
+plt.title("Class Imbalance of Rating after OverSampling")
+plt.show()
+
+##################################################
+
 
 ##### LinearRegression regression algorithm #####
 linear = LinearRegression()
