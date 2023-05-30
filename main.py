@@ -8,6 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
+import gensim
 from sklearn.metrics import (
     mean_squared_error,
     r2_score,
@@ -19,7 +20,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+from gensim.parsing.porter import PorterStemmer
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
 
@@ -105,45 +106,99 @@ test_imp.columns = [
     "year",
 ]
 
-## Converting the text in the review column to numerical data
-vectorizer = TfidfVectorizer(stop_words="english", max_features=3000)
-train_reviews = vectorizer.fit_transform(train_imp["review"])
-test_reviews = vectorizer.transform(test_imp["review"])
+##creating new df to perform operations 
+df = train_imp
+df1 = test_imp
 
-## Replacing the review column with the numerical data
-train_imp.drop("review", axis=1, inplace=True)
-test_imp.drop("review", axis=1, inplace=True)
-train_imp = pd.concat(
-    [train_imp, pd.DataFrame(train_reviews.toarray()).add_prefix("review")], axis=1
-)
-test_imp = pd.concat(
-    [test_imp, pd.DataFrame(test_reviews.toarray()).add_prefix("review")], axis=1
-)
+## Tokenization
+df['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in df['review']] 
+df1['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in df1['review']] 
+
+## Stemming
+porter_stemmer = PorterStemmer()
+# Get the stemmed_tokens
+df['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in df['tokenized_text']]
+df1['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in df1['tokenized_text'] ]
+
+##Applying Word2vec
+from gensim.models import Word2Vec
+# Skip-gram model (sg = 1)
+size = 1000
+window = 3
+min_count = 1 #The minimum count of words to consider when training the model; words with occurrence less than this count will be ignored.
+workers = 3
+sg = 1 #The training algorithm, either CBOW(0) or skip gram(1). The default training algorithm is CBOW.
+
+
+stemmed_tokens = pd.Series(df['stemmed_tokens']).values
+stemmed_tokens1 = pd.Series(df1['stemmed_tokens']).values
+stemmed_tokens2 = np.append(stemmed_tokens,stemmed_tokens1,axis=0)
+w2vmodel = Word2Vec(stemmed_tokens4, min_count = min_count, vector_size = size, workers = workers, window = window, sg = sg)
+
+### Store the vectors for train data in following file
+index = 0
+word2vec_filename = 'train_review_word2vec.csv'
+with open(word2vec_filename, 'w') as word2vec_file:
+    for i in range(129038):
+        model_vector = (np.mean([w2vmodel.wv[token] for token in df['stemmed_tokens'][i]], axis=0)).tolist()
+        if index == 0:
+            header = ",".join(str(ele) for ele in range(1000))
+            word2vec_file.write(header)
+            word2vec_file.write("\n")
+        index+=1
+        # Check if the line exists else it is vector of zeros
+        if type(model_vector) is list:  
+            line1 = ",".join( [str(vector_element) for vector_element in model_vector] )
+        word2vec_file.write(line1)
+        word2vec_file.write('\n')
+        
+review_vector = pd.read_csv(r"train_review_word2vec.csv")   
+
+### Store the vectors for test data in following file
+
+index = 0
+word2vec_filename = 'test_review_word2vec.csv'
+with open(word2vec_filename, 'w') as word2vec_file:
+    for i in range(53766):
+        model_vector = (np.mean([w2vmodel.wv[token] for token in df1['stemmed_tokens'][i]], axis=0)).tolist()
+        if index == 0:
+            header = ",".join(str(ele) for ele in range(1000))
+            word2vec_file.write(header)
+            word2vec_file.write("\n")
+        index+=1
+        # Check if the line exists else it is vector of zeros
+        if type(model_vector) is list:  
+            line1 = ",".join( [str(vector_element) for vector_element in model_vector] )
+        word2vec_file.write(line1)
+        word2vec_file.write('\n')
+reivew_vector1 = pd.read_csv(r"test_review_word2vec.csv")
+
+## Joining vector and dropping necessary columns
+df = pd.concat([df,review_vector],axis="columns")
+df.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
+df1 = pd.concat([df1,reivew_vector1],axis="columns")
+df1.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
+
 
 ## Encoding the categorical columns
 for i in ["drugName", "condition"]:
-    train_imp[i] = LabelEncoder().fit_transform(train_imp[i])
-    test_imp[i] = LabelEncoder().fit_transform(test_imp[i])
+    df[i] = LabelEncoder().fit_transform(df[i])
+    df1[i] = LabelEncoder().fit_transform(df1[i])
 
 ## Converting the data types of columns to reduce the memory usage
-train_imp, test_imp = train_imp.astype("float16"), test_imp.astype("float16")
-train_imp[["drugName", "condition", "usefulCount", "year"]] = train_imp[
-    ["drugName", "condition", "usefulCount", "year"]
-].astype("int16")
-test_imp[["drugName", "condition", "usefulCount", "year"]] = test_imp[
-    ["drugName", "condition", "usefulCount", "year"]
-].astype("int16")
-train_imp[["rating"]] = train_imp[["rating"]].astype("float16")
-test_imp[["rating"]] = test_imp[["rating"]].astype("float16")
-train_imp[["day", "month"]] = train_imp[["day", "month"]].astype("int8")
-test_imp[["day", "month"]] = test_imp[["day", "month"]].astype("int8")
-
+df, df1 = df.astype('float16'), df1.astype('float16')
+df[['drugName', 'condition', 'usefulCount', 'year']] = df[['drugName', 'condition', 'usefulCount', 'year']].astype('int16')
+df1[['drugName', 'condition', 'usefulCount', 'year']] = df1[['drugName', 'condition', 'usefulCount', 'year']].astype('int16')
+df[['rating']] = df[['rating']].astype('float16')
+df1[['rating']] = df1[['rating']].astype('float16')
+df[['day', 'month']] = df[['day', 'month']].astype('int8')
+df1[['day', 'month']] = df1[['day', 'month']].astype('int8')
 # print(train_imp.iloc[:,:15].dtypes)
 # print(test_imp.iloc[:,:15].dtypes)
 
 ## Splitting the train and test datasets into feature variables
-X_train, Y_train = train_imp.drop("rating", axis=1), train_imp["rating"]
-X_test, Y_test = test_imp.drop("rating", axis=1), test_imp["rating"]
+X_train, Y_train = df.drop('rating', axis=1), df['rating']
+X_test, Y_test = df1.drop('rating', axis=1), df1['rating']
 
 X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
@@ -368,7 +423,7 @@ model.add(LSTM(32, input_shape=(3006, 1)))
 model.add(Dense(1))
 
 # Reshape the X_train data
-X_train = X_train.values.reshape(129038, 3006, 1)
+X_train = X_train.values.reshape(129038, 1006, 1)
 
 # Reshape the y_train data
 Y_train = Y_train.values.reshape(129038, 1)
@@ -377,7 +432,7 @@ Y_train = Y_train.values.reshape(129038, 1)
 Y_test = Y_test.values.reshape(53766, 1)
 
 # Reshape the X_test data
-X_test = X_test.values.reshape(53766, 3006, 1)
+X_test = X_test.values.reshape(53766, 1006, 1)
 
 # Compile the model
 model.compile(loss="mse", optimizer="adam")
