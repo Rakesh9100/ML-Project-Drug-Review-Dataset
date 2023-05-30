@@ -35,12 +35,12 @@ dtypes = {
     "usefulCount": "int16",
 }
 train_df = pd.read_csv(
-    r"C:\\Users\\harsh\\Desktop\\ML Projects\\GSSOC\\datasets\\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+    r"datasets/drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
 )
 
 train_df = train_df.sample(frac=0.8, random_state=42)
 test_df = pd.read_csv(
-    r"C:\\Users\\harsh\\Desktop\\ML Projects\\GSSOC\\datasets\\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+    r"datasets/drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
 )
 
 ## Converting date column to datetime format
