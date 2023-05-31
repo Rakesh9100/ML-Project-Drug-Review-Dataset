@@ -133,7 +133,7 @@ sg = 1 #The training algorithm, either CBOW(0) or skip gram(1). The default trai
 stemmed_tokens = pd.Series(df['stemmed_tokens']).values
 stemmed_tokens1 = pd.Series(df1['stemmed_tokens']).values
 stemmed_tokens2 = np.append(stemmed_tokens,stemmed_tokens1,axis=0)
-w2vmodel = Word2Vec(stemmed_tokens4, min_count = min_count, vector_size = size, workers = workers, window = window, sg = sg)
+w2vmodel = Word2Vec(stemmed_tokens2, min_count = min_count, vector_size = size, workers = workers, window = window, sg = sg)
 
 ### Store the vectors for train data in following file
 index = 0
