@@ -89,6 +89,16 @@ X_test, Y_test = test_imp.drop('rating', axis=1), test_imp['rating']
 X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
 
+# Plotting Scatter chart between Drug Name and Ratings
+df_test=pd.read_csv("https://raw.githubusercontent.com/Rakesh9100/ML-Project-Drug-Review-Dataset/main/datasets/drugsComTest_raw.tsv",sep="\t")
+lb=LabelEncoder()
+a=lb.fit_transform(df_test.drugName)
+lb.inverse_transform([a[0]])
+plt.scatter(a,df_test.rating)
+plt.xlabel("Drug Name")
+plt.ylabel("Ratings")
+plt.show()
+
 ##### LinearRegression regression algorithm #####
 
 linear=LinearRegression()
