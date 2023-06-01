@@ -8,6 +8,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.over_sampling import SMOTE
 from sklearn.metrics import (
     mean_squared_error,
     r2_score,
@@ -430,3 +432,18 @@ plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
+
+
+##### Random Forest Algorithm with Random UnderSampler #####
+sampler = RandomUnderSampler()
+X_train1, y_train1 = sampler.fit_resample(X_train, Y_train)
+
+clf2= RandomForestClassifier().fit(X_train1, y_train1)
+
+#Make Predictions
+pred = clf.predict(X_test)
+
+# Evaluating
+print("Accuracy: %s" % str(clf.score(X_test, Y_test)))
+print("Confusion Matrix")
+print(confusion_matrix(pred, Y_test))
