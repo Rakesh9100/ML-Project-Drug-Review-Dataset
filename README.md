@@ -3,7 +3,22 @@
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <div id="top"></div>
-
+<div align="center">
+<img src="https://forthebadge.com/images/badges/built-with-love.svg" />
+<img src="https://forthebadge.com/images/badges/uses-brains.svg" />
+<img src="https://forthebadge.com/images/badges/powered-by-responsibility.svg" />
+  <br>
+<img src="https://img.shields.io/github/repo-size/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues-closed-raw/Rakesh9100/ML-Project-Drug-Review-Dataset?color=blue&style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues-pr/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues-pr-closed-raw/Rakesh9100/ML-Project-Drug-Review-Dataset?color=green&style=for-the-badge" />
+  <img src="https://img.shields.io/github/license/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/forks/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  <img src="https://img.shields.io/github/stars/Rakesh9100/ML-Project-Drug-Review-Dataset?color=yello&style=for-the-badge" />
+  <img src="https://img.shields.io/github/contributors/Rakesh9100/ML-Project-Drug-Review-Dataset?style=for-the-badge" />
+  
+</div>
 <h2>Table of Contents🧾</h2>
 
 - [Introduction📌](#introduction)
@@ -261,7 +276,7 @@ Note: The model's highest accuracy is approximately 50%. Further refinement thro
 
 <h2>Contributing Guidelines📑</h2>
 
-Read our [Contributing Guidelines](https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/blob/main/.github/CONTRIBUTING_GUIDELINES.md) to learn about our development process, how to propose bugfixes and improvements, and how to build to Music-Recommendation-System.
+Read our [Contributing Guidelines](https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/blob/main/.github/CONTRIBUTING_GUIDELINES.md) to learn about our development process, how to propose bugfixes and improvements, and how to build to ML-Project-Drug-Review-Dataset.
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -294,7 +309,6 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 <h2>Contributing is fun🧡</h2>
 
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 <h3>Contributions of any kind from anyone are always welcome🌟!!</h3>
 <h3>Give it a 🌟 if you ❤ this project. Happy Coding👨‍💻</h3>
 <p align="right">(<a href="#top">back to top</a>)</p>
