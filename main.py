@@ -149,6 +149,15 @@ X_test, Y_test = test_imp.drop("rating", axis=1), test_imp["rating"]
 X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
 
+# Plotting Scatter chart between Drug Name and Ratings
+LabelEncoder().fit_transform(test_df.drugName)
+plt.scatter(LabelEncoder().fit_transform(test_df.drugName),test_df.rating)
+plt.xlabel("Drug Name")
+plt.ylabel("Ratings")
+plt.title('Scatter Plot: Drug Name vs Ratings (Testing Data)')
+plt.show()
+
+##### LinearRegression regression algorithm #####
 ##### EDA
 
 ##### 1) Summary and Stats
@@ -192,6 +201,7 @@ plt.hist(Y_train, bins=10)
 plt.xlabel("Class")
 plt.ylabel("Count")
 plt.show()
+
 
 plt.figure(figsize=(10, 6))
 sns.countplot(x="rating", data=train_imp)
@@ -479,7 +489,8 @@ test_predictions = test_predictions.reshape(test_predictions.shape[0])
 
 # Create a scatter plot
 plt.scatter(Y_test, test_predictions)
-plt.xlabel("Actual Values")
-plt.ylabel("Predicted Values")
-plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
+
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.title('Scatter Plot: Predicted vs Actual (Testing Data)')
 plt.show()
