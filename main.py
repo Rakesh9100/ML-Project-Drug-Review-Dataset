@@ -494,3 +494,132 @@ plt.xlabel('Actual Values')
 plt.ylabel('Predicted Values')
 plt.title('Scatter Plot: Predicted vs Actual (Testing Data)')
 plt.show()
+
+
+
+### TEXT PREPOCESSING , CREATION OF WORDCLOUDS ON THE REVIEW COLUMN , TEXT CLASSIFICATION (FEATURE EXTRACTION- BoW) , XGBoost MODEL ###
+
+
+    # CHECKING FOR NULL VALUES , DUPLICATE VALUES ,DROPPING UNNAMED COLUMNS 
+    train_df.isnull().sum()
+    train_df = train_df.dropna(subset=['condition'])
+    train_df.isnull().sum()
+    
+    train_df.duplicated().sum()
+    train_df.head()
+ 
+ 
+ #TEXT PREPROCESSING
+
+#LOWER CASE
+#STRING PUNCTUATIONS
+#TOKENIZATION
+# STEMMING 
+#all of this would be  done on the 'Reviews' column
+
+train_df['review']= train_df['review'].str.lower()
+import  string
+string.punctuation
+from nltk.stem.porter import PorterStemmer
+ps=PorterStemmer()
+train_df['review'] = train_df['review'].str.replace('[{}]'.format(string.punctuation), '')
+import nltk
+
+train_df['review'] = train_df['review'].apply(nltk.word_tokenize)
+train_df.head()
+
+#Creating WordClouds for REVIEWS having rating >=5 and <=5
+train_df['review'] = train_df['review'].apply(lambda x: ' '.join(x))
+from wordcloud import WordCloud
+wc=WordCloud(width=500,height=500,min_font_size=10,background_color='white')
+
+rev5_wc=wc.generate(train_df[train_df['rating']>=5]['review'].str.cat(sep=" "))
+plt.figure(figsize=(10, 5))
+plt.imshow(rev5_wc, interpolation='bilinear')
+plt.axis('on')
+plt.show()
+
+rev4_wc=wc.generate(train_df[train_df['rating']<=5]['review'].str.cat(sep=" "))
+plt.figure(figsize=(10, 5))
+plt.imshow(rev4_wc, interpolation='bilinear')
+plt.axis('on')
+plt.show()
+
+# TEXT CLASSIFICATION- FEATURE SELECTION 
+# APPLYING BAGofWORDS feature on the processed Review 
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Create an instance of CountVectorizer
+reviews=train_df['review']
+vectorizer = CountVectorizer(max_features=1000)
+X_bow = vectorizer.fit_transform(reviews)
+
+
+# Fit and transform the reviews into a BoW feature matrix
+X_bow= vectorizer.fit_transform(reviews)
+
+#Constructing the XGBoost Model 
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
+X=X_bow
+y=train_df['rating']
+unique_labels = y.unique()
+print(unique_labels)
+y=y-1
+y=y.astype(int)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print("Training set shape:", X_train.shape)
+print("Testing set shape:", X_test.shape)
+model = xgb.XGBClassifier()
+model.fit(X_train, y_train)
+y_pred=model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+from sklearn.metrics import precision_score
+print("Precision:",precision_score(y_test,y_pred,average='macro'))
+
+#Plotting the graph to check for accuracy and precision .
+accuracy= 0.5853173830027666
+precision=0.5977667150507872
+
+metrics=['accuracy','precision']
+scores=[accuracy,precision]
+
+x_pos=np.arange(len(metrics))
+
+plt.bar(x_pos,scores,align='center',alpha=0.8)
+plt.xticks(x_pos, metrics)
+plt.ylabel('Score')
+plt.title('Accuracy and Precision')
+
+# Add labels to each bar
+for i, score in enumerate(scores):
+    plt.text(i, score + 0.01, str(score), ha='center')
+
+plt.show()
+
+#Scatter Plot 
+
+# Make predictions on testing data
+test_predictions = model.predict(X_test)
+
+# Reshape the predictions
+test_predictions = test_predictions.reshape(test_predictions.shape[0])
+
+# Create a scatter plot
+plt.scatter(y_test, test_predictions)
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
+plt.show()
+
+
+    
+   
+
+
+
+
+
+    
