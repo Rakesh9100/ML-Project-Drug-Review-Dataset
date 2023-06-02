@@ -276,7 +276,7 @@ Note: The model's highest accuracy is approximately 50%. Further refinement thro
 
 <h2>Contributing Guidelines📑</h2>
 
-Read our [Contributing Guidelines](https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/blob/main/.github/CONTRIBUTING_GUIDELINES.md) to learn about our development process, how to propose bugfixes and improvements, and how to build to Music-Recommendation-System.
+Read our [Contributing Guidelines](https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/blob/main/.github/CONTRIBUTING_GUIDELINES.md) to learn about our development process, how to propose bugfixes and improvements, and how to build to ML-Project-Drug-Review-Dataset.
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 

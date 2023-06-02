@@ -21,6 +21,8 @@ from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
 from gensim.parsing.porter import PorterStemmer
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from imblearn.over_sampling import RandomOverSampler
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
 
@@ -202,6 +204,58 @@ X_test, Y_test = df1.drop('rating', axis=1), df1['rating']
 
 X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
+
+##### EDA
+
+##### 1) Summary and Stats
+
+# a) Checking Null Values
+
+print("Null Values in Train Data:\n", X_train.isnull().sum())
+print("Null Values in Test Data:\n", X_test.isnull().sum())
+
+# b) Checking the shape of the data
+
+print("Shape of Train Data:", X_train.shape)
+print("Shape of Test Data:", X_test.shape)
+
+# c) Zero Counts
+
+print("Zero Counts in Train Data:\n", (X_train == 0).sum())
+print("Zero Counts in Test Data:\n", (X_test == 0).sum())
+
+##### 2) Visualizations
+
+# a) Box Plot
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x="rating", data=train_imp)
+plt.title("Box Plot of Rating")
+plt.show()
+
+# b) Class Imbalance
+
+plt.figure(figsize=(10, 6))
+sns.countplot(x="rating", data=train_imp)
+plt.title("Class Imbalance of Rating")
+plt.show()
+
+### Over Sampling to handle Class Imbalance
+
+ros = RandomOverSampler(random_state=0)
+X_train, Y_train = ros.fit_resample(X_train, Y_train)
+plt.hist(Y_train, bins=10)
+plt.xlabel("Class")
+plt.ylabel("Count")
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(x="rating", data=train_imp)
+plt.title("Class Imbalance of Rating after OverSampling")
+plt.show()
+
+##################################################
+
 
 ##### LinearRegression regression algorithm #####
 linear = LinearRegression()
