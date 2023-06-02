@@ -441,9 +441,22 @@ X_train1, y_train1 = sampler.fit_resample(X_train, Y_train)
 clf2= RandomForestClassifier().fit(X_train1, y_train1)
 
 #Make Predictions
-pred = clf.predict(X_test)
+pred = clf2.predict(X_test)
 
 # Evaluating
-print("Accuracy: %s" % str(clf.score(X_test, Y_test)))
+print("Accuracy: %s" % str(clf2.score(X_test, Y_test)))
+print("Confusion Matrix")
+print(confusion_matrix(pred, Y_test))
+
+
+##### Random Forest With SMOTE
+
+sampler2 = SMOTE()
+X_train2, y_train2 = sampler2.fit_resample(X_train, Y_train)
+clf3= RandomForestClassifier().fit(X_train2, y_train2)
+
+pred = clf3.predict(X_test)
+
+print("Accuracy: %s" % str(clf3.score(X_test, Y_test)))
 print("Confusion Matrix")
 print(confusion_matrix(pred, Y_test))
