@@ -489,22 +489,13 @@ plt.show()
 ### TEXT PREPOCESSING , CREATION OF WORDCLOUDS ON THE REVIEW COLUMN , TEXT CLASSIFICATION (FEATURE EXTRACTION- BoW) , XGBoost MODEL ###
 
 
-## Converting date column to datetime format
-train_df['date'], test_df['date'] = pd.to_datetime(train_df['date'], format='%B %d, %Y'), pd.to_datetime(test_df['date'], format='%B %d, %Y')
-
-## Extracting day, month, and year into separate columns
-for df in [train_df, test_df]:
-    df['day'] = df['date'].dt.day.astype('int8')
-    df['month'] = df['date'].dt.month.astype('int8')
-    df['year'] = df['date'].dt.year.astype('int16')
-    
     # CHECKING FOR NULL VALUES , DUPLICATE VALUES ,DROPPING UNNAMED COLUMNS 
     train_df.isnull().sum()
     train_df = train_df.dropna(subset=['condition'])
     train_df.isnull().sum()
     
- train_df.duplicated().sum()
- train_df.head()
+    train_df.duplicated().sum()
+    train_df.head()
  
  
  #TEXT PREPROCESSING
@@ -549,7 +540,7 @@ plt.show()
 from sklearn.feature_extraction.text import CountVectorizer
 
 # Create an instance of CountVectorizer
-
+reviews=train_df['review']
 vectorizer = CountVectorizer(max_features=1000)
 X_bow = vectorizer.fit_transform(reviews)
 
@@ -613,7 +604,8 @@ plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
 
 
-
+    
+   
 
 
 
