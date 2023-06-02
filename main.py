@@ -513,7 +513,7 @@ for df in [train_df, test_df]:
 #STRING PUNCTUATIONS
 #TOKENIZATION
 # STEMMING 
-all of this would be  done on the 'Reviews' column
+#all of this would be  done on the 'Reviews' column
 
 train_df['review']= train_df['review'].str.lower()
 import  string
