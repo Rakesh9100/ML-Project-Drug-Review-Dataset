@@ -108,19 +108,15 @@ test_imp.columns = [
     "year",
 ]
 
-##creating new df to perform operations 
-df = train_imp
-df1 = test_imp
-
 ## Tokenization
-df['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in df['review']] 
-df1['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in df1['review']] 
+train_imp['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in train_imp['review']] 
+test_imp['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in test_imp['review']] 
 
 ## Stemming
 porter_stemmer = PorterStemmer()
 # Get the stemmed_tokens
-df['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in df['tokenized_text']]
-df1['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in df1['tokenized_text'] ]
+train_imp['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in train_imp['tokenized_text']]
+test_imp['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in test_imp['tokenized_text'] ]
 
 ##Applying Word2vec
 from gensim.models import Word2Vec
@@ -131,18 +127,18 @@ min_count = 1 #The minimum count of words to consider when training the model; w
 workers = 3
 sg = 1 #The training algorithm, either CBOW(0) or skip gram(1). The default training algorithm is CBOW.
 
-
-stemmed_tokens = pd.Series(df['stemmed_tokens']).values
-stemmed_tokens1 = pd.Series(df1['stemmed_tokens']).values
-stemmed_tokens2 = np.append(stemmed_tokens,stemmed_tokens1,axis=0)
-w2vmodel = Word2Vec(stemmed_tokens2, min_count = min_count, vector_size = size, workers = workers, window = window, sg = sg)
+## Merging values from both train and test dataframe
+stemmed_tokens_train = pd.Series(train_imp['stemmed_tokens']).values
+stemmed_tokens_test = pd.Series(test_imp['stemmed_tokens']).values
+stemmed_tokens_merged = np.append(stemmed_tokens_train,stemmed_tokens_test,axis=0)
+w2vmodel = Word2Vec(stemmed_tokens_merged, min_count = min_count, vector_size = size, workers = workers, window = window, sg = sg)
 
 ### Store the vectors for train data in following file
 index = 0
 word2vec_filename = 'train_review_word2vec.csv'
 with open(word2vec_filename, 'w') as word2vec_file:
     for i in range(129038):
-        model_vector = (np.mean([w2vmodel.wv[token] for token in df['stemmed_tokens'][i]], axis=0)).tolist()
+        model_vector = (np.mean([w2vmodel.wv[token] for token in train_imp['stemmed_tokens'][i]], axis=0)).tolist()
         if index == 0:
             header = ",".join(str(ele) for ele in range(1000))
             word2vec_file.write(header)
@@ -162,7 +158,7 @@ index = 0
 word2vec_filename = 'test_review_word2vec.csv'
 with open(word2vec_filename, 'w') as word2vec_file:
     for i in range(53766):
-        model_vector = (np.mean([w2vmodel.wv[token] for token in df1['stemmed_tokens'][i]], axis=0)).tolist()
+        model_vector = (np.mean([w2vmodel.wv[token] for token in test_imp['stemmed_tokens'][i]], axis=0)).tolist()
         if index == 0:
             header = ",".join(str(ele) for ele in range(1000))
             word2vec_file.write(header)
@@ -176,31 +172,32 @@ with open(word2vec_filename, 'w') as word2vec_file:
 reivew_vector1 = pd.read_csv(r"test_review_word2vec.csv")
 
 ## Joining vector and dropping necessary columns
-df = pd.concat([df,review_vector],axis="columns")
-df.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
-df1 = pd.concat([df1,reivew_vector1],axis="columns")
-df1.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
+train_imp = pd.concat([train_imp,review_vector],axis="columns")
+train_imp.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
+test_imp = pd.concat([test_imp,reivew_vector1],axis="columns")
+test_imp.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
 
 
 ## Encoding the categorical columns
 for i in ["drugName", "condition"]:
-    df[i] = LabelEncoder().fit_transform(df[i])
-    df1[i] = LabelEncoder().fit_transform(df1[i])
+    train_imp[i] = LabelEncoder().fit_transform(train_imp[i])
+    test_imp[i] = LabelEncoder().fit_transform(test_imp[i])
 
 ## Converting the data types of columns to reduce the memory usage
-df, df1 = df.astype('float16'), df1.astype('float16')
-df[['drugName', 'condition', 'usefulCount', 'year']] = df[['drugName', 'condition', 'usefulCount', 'year']].astype('int16')
-df1[['drugName', 'condition', 'usefulCount', 'year']] = df1[['drugName', 'condition', 'usefulCount', 'year']].astype('int16')
-df[['rating']] = df[['rating']].astype('float16')
-df1[['rating']] = df1[['rating']].astype('float16')
-df[['day', 'month']] = df[['day', 'month']].astype('int8')
-df1[['day', 'month']] = df1[['day', 'month']].astype('int8')
+train_imp, test_imp = train_imp.astype("float16"), test_imp.astype("float16")
+train_imp[["drugName", "condition", "usefulCount", "year"]] = train_imp[["drugName", "condition", "usefulCount", "year"]].astype("int16")
+test_imp[["drugName", "condition", "usefulCount", "year"]] = test_imp[["drugName", "condition", "usefulCount", "year"]].astype("int16")
+train_imp[["rating"]] = train_imp[["rating"]].astype("float16")
+test_imp[["rating"]] = test_imp[["rating"]].astype("float16")
+train_imp[["day", "month"]] = train_imp[["day", "month"]].astype("int8")
+test_imp[["day", "month"]] = test_imp[["day", "month"]].astype("int8")
+
 # print(train_imp.iloc[:,:15].dtypes)
 # print(test_imp.iloc[:,:15].dtypes)
 
 ## Splitting the train and test datasets into feature variables
-X_train, Y_train = df.drop('rating', axis=1), df['rating']
-X_test, Y_test = df1.drop('rating', axis=1), df1['rating']
+X_train, Y_train = train_imp.drop("rating", axis=1), train_imp["rating"]
+X_test, Y_test = test_imp.drop("rating", axis=1), test_imp["rating"]
 
 X_train.columns = X_train.columns.astype(str)
 X_test.columns = X_test.columns.astype(str)
@@ -255,7 +252,6 @@ plt.title("Class Imbalance of Rating after OverSampling")
 plt.show()
 
 ##################################################
-
 
 ##### LinearRegression regression algorithm #####
 linear = LinearRegression()
