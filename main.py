@@ -36,14 +36,10 @@ dtypes = {
     "date": "string",
     "usefulCount": "int16",
 }
-train_df = pd.read_csv(
-    r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
-)
+train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 
 train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv(
-    r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
-)
+test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 
 ## Converting date column to datetime format
 train_df["date"], test_df["date"] = pd.to_datetime(
@@ -109,74 +105,103 @@ test_imp.columns = [
 ]
 
 ## Tokenization
-train_imp['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in train_imp['review']] 
-test_imp['tokenized_text'] = [gensim.utils.simple_preprocess(line, deacc=True) for line in test_imp['review']] 
+train_imp["tokenized_text"] = [
+    gensim.utils.simple_preprocess(line, deacc=True) for line in train_imp["review"]
+]
+test_imp["tokenized_text"] = [
+    gensim.utils.simple_preprocess(line, deacc=True) for line in test_imp["review"]
+]
 
 ## Stemming
 porter_stemmer = PorterStemmer()
 # Get the stemmed_tokens
-train_imp['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in train_imp['tokenized_text']]
-test_imp['stemmed_tokens'] = [[porter_stemmer.stem(word) for word in tokens] for tokens in test_imp['tokenized_text'] ]
+train_imp["stemmed_tokens"] = [
+    [porter_stemmer.stem(word) for word in tokens]
+    for tokens in train_imp["tokenized_text"]
+]
+test_imp["stemmed_tokens"] = [
+    [porter_stemmer.stem(word) for word in tokens]
+    for tokens in test_imp["tokenized_text"]
+]
 
 ##Applying Word2vec
 from gensim.models import Word2Vec
+
 # Skip-gram model (sg = 1)
 size = 1000
 window = 3
-min_count = 1 #The minimum count of words to consider when training the model; words with occurrence less than this count will be ignored.
+min_count = 1  # The minimum count of words to consider when training the model; words with occurrence less than this count will be ignored.
 workers = 3
-sg = 1 #The training algorithm, either CBOW(0) or skip gram(1). The default training algorithm is CBOW.
+sg = 1  # The training algorithm, either CBOW(0) or skip gram(1). The default training algorithm is CBOW.
 
 ## Merging values from both train and test dataframe
-stemmed_tokens_train = pd.Series(train_imp['stemmed_tokens']).values
-stemmed_tokens_test = pd.Series(test_imp['stemmed_tokens']).values
-stemmed_tokens_merged = np.append(stemmed_tokens_train,stemmed_tokens_test,axis=0)
-w2vmodel = Word2Vec(stemmed_tokens_merged, min_count = min_count, vector_size = size, workers = workers, window = window, sg = sg)
+stemmed_tokens_train = pd.Series(train_imp["stemmed_tokens"]).values
+stemmed_tokens_test = pd.Series(test_imp["stemmed_tokens"]).values
+stemmed_tokens_merged = np.append(stemmed_tokens_train, stemmed_tokens_test, axis=0)
+w2vmodel = Word2Vec(
+    stemmed_tokens_merged,
+    min_count=min_count,
+    vector_size=size,
+    workers=workers,
+    window=window,
+    sg=sg,
+)
 
 ### Store the vectors for train data in following file
 index = 0
-word2vec_filename = 'train_review_word2vec.csv'
-with open(word2vec_filename, 'w') as word2vec_file:
+word2vec_filename = "train_review_word2vec.csv"
+with open(word2vec_filename, "w") as word2vec_file:
     for i in range(129038):
-        model_vector = (np.mean([w2vmodel.wv[token] for token in train_imp['stemmed_tokens'][i]], axis=0)).tolist()
+        model_vector = (
+            np.mean(
+                [w2vmodel.wv[token] for token in train_imp["stemmed_tokens"][i]], axis=0
+            )
+        ).tolist()
         if index == 0:
             header = ",".join(str(ele) for ele in range(1000))
             word2vec_file.write(header)
             word2vec_file.write("\n")
-        index+=1
+        index += 1
         # Check if the line exists else it is vector of zeros
-        if type(model_vector) is list:  
-            line1 = ",".join( [str(vector_element) for vector_element in model_vector] )
+        if type(model_vector) is list:
+            line1 = ",".join([str(vector_element) for vector_element in model_vector])
         word2vec_file.write(line1)
-        word2vec_file.write('\n')
-        
-review_vector = pd.read_csv(r"train_review_word2vec.csv")   
+        word2vec_file.write("\n")
+
+review_vector = pd.read_csv(r"train_review_word2vec.csv")
 
 ### Store the vectors for test data in following file
 
 index = 0
-word2vec_filename = 'test_review_word2vec.csv'
-with open(word2vec_filename, 'w') as word2vec_file:
+word2vec_filename = "test_review_word2vec.csv"
+with open(word2vec_filename, "w") as word2vec_file:
     for i in range(53766):
-        model_vector = (np.mean([w2vmodel.wv[token] for token in test_imp['stemmed_tokens'][i]], axis=0)).tolist()
+        model_vector = (
+            np.mean(
+                [w2vmodel.wv[token] for token in test_imp["stemmed_tokens"][i]], axis=0
+            )
+        ).tolist()
         if index == 0:
             header = ",".join(str(ele) for ele in range(1000))
             word2vec_file.write(header)
             word2vec_file.write("\n")
-        index+=1
+        index += 1
         # Check if the line exists else it is vector of zeros
-        if type(model_vector) is list:  
-            line1 = ",".join( [str(vector_element) for vector_element in model_vector] )
+        if type(model_vector) is list:
+            line1 = ",".join([str(vector_element) for vector_element in model_vector])
         word2vec_file.write(line1)
-        word2vec_file.write('\n')
+        word2vec_file.write("\n")
 reivew_vector1 = pd.read_csv(r"test_review_word2vec.csv")
 
 ## Joining vector and dropping necessary columns
-train_imp = pd.concat([train_imp,review_vector],axis="columns")
-train_imp.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
-test_imp = pd.concat([test_imp,reivew_vector1],axis="columns")
-test_imp.drop(["review","tokenized_text","stemmed_tokens"],axis="columns",inplace=True)
-
+train_imp = pd.concat([train_imp, review_vector], axis="columns")
+train_imp.drop(
+    ["review", "tokenized_text", "stemmed_tokens"], axis="columns", inplace=True
+)
+test_imp = pd.concat([test_imp, reivew_vector1], axis="columns")
+test_imp.drop(
+    ["review", "tokenized_text", "stemmed_tokens"], axis="columns", inplace=True
+)
 
 ## Encoding the categorical columns
 for i in ["drugName", "condition"]:
@@ -185,8 +210,12 @@ for i in ["drugName", "condition"]:
 
 ## Converting the data types of columns to reduce the memory usage
 train_imp, test_imp = train_imp.astype("float16"), test_imp.astype("float16")
-train_imp[["drugName", "condition", "usefulCount", "year"]] = train_imp[["drugName", "condition", "usefulCount", "year"]].astype("int16")
-test_imp[["drugName", "condition", "usefulCount", "year"]] = test_imp[["drugName", "condition", "usefulCount", "year"]].astype("int16")
+train_imp[["drugName", "condition", "usefulCount", "year"]] = train_imp[
+    ["drugName", "condition", "usefulCount", "year"]
+].astype("int16")
+test_imp[["drugName", "condition", "usefulCount", "year"]] = test_imp[
+    ["drugName", "condition", "usefulCount", "year"]
+].astype("int16")
 train_imp[["rating"]] = train_imp[["rating"]].astype("float16")
 test_imp[["rating"]] = test_imp[["rating"]].astype("float16")
 train_imp[["day", "month"]] = train_imp[["day", "month"]].astype("int8")
@@ -379,7 +408,6 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title("Logistic Regression Confusion Matrix")
 plt.show()
 
-
 ##### Perceptron Model classification algorithm #####
 
 
@@ -392,7 +420,6 @@ mlpcls_test = mlpcls.predict(X_test)
 print("\nMulti Layer Perceptron Metrics:")
 print("Accuracy for training ", accuracy_score(mlpcls_train, Y_train))
 print("Accuracy for testing ", accuracy_score(mlpcls_test, Y_test))
-
 
 # Plotting the scatter plot of actual vs predicted values
 plt.scatter(Y_test, mlpcls_test, color="blue", label="Predicted Ratings")
@@ -463,7 +490,6 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(
 )
 plt.title("Decision Tree Classifier - Confusion Matrix")
 plt.show()
-
 
 ##### Long Short-Term Memory algorithm #####
 
