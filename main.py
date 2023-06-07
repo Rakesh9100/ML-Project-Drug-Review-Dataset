@@ -1,22 +1,56 @@
-import pandas as pd, numpy as np
-import warnings
+import pandas as pd
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
-from sklearn.impute import SimpleImputer
 from sklearn.exceptions import ConvergenceWarning
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import StandardScaler
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from gensim.models import KeyedVectors
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import LabelEncoder
-from sklearn.linear_model import LinearRegression, LogisticRegression, Perceptron
-from sklearn.tree import DecisionTreeClassifier
+import warnings
+warnings.filterwarnings('ignore', category=MarkupResemblesLocatorWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
+from sklearn.linear_model import LinearRegression
+import re
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+import string
+from gensim.models import Word2Vec
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.linear_model import LogisticRegression, Perceptron
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, plot_confusion_matrix 
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
+
+from sklearn.decomposition import PCA
+from gensim.models import Word2Vec
+import numpy as np
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+
+# Download the necessary resources
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet') 
 
 ## Reading the data
 dtypes = { 'Unnamed: 0': 'int32', 'drugName': 'category', 'condition': 'category', 'review': 'category', 'rating': 'float16', 'date': 'category', 'usefulCount': 'int16' }
-train_df = pd.read_csv('datasets/drugsComTrain_raw.tsv', sep='\t', dtype=dtypes)
+train_df = pd.read_csv('drugsComTrain_raw.tsv',delimiter='\t', dtype=dtypes)
+test_df= pd.read_csv('drugsComTest_raw.tsv',delimiter='\t', dtype=dtypes)
 # Randomly selecting 80% of the data from the training dataset
-train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv('datasets/drugsComTest_raw.tsv', sep='\t', dtype=dtypes)
+total_samples = len(train_df)  # or total number of records
+samples_to_read = int(0.8 * total_samples)  # 50% of the total
+train_df = train_df.sample(n=samples_to_read, random_state=42)
+
 
 ## Converting date column to datetime format
 train_df['date'], test_df['date'] = pd.to_datetime(train_df['date'], format='%B %d, %Y'), pd.to_datetime(test_df['date'], format='%B %d, %Y')
@@ -52,14 +86,105 @@ test_imp.columns = ['drugName', 'condition', 'review', 'rating', 'usefulCount', 
 
 ## Converting the text in the review column to numerical data
 vectorizer = TfidfVectorizer(stop_words='english', max_features=3000)
-train_reviews = vectorizer.fit_transform(train_imp['review'])
-test_reviews = vectorizer.transform(test_imp['review'])
+train_reviews_tfid = vectorizer.fit_transform(train_imp['review'])
+test_reviews_tfid = vectorizer.transform(test_imp['review'])
+
+# word2vec vectorizer
+# Initialize stopwords and punctuation
+stop_words = set(stopwords.words('english'))
+punctuation = set(string.punctuation)
+
+# Initialize stemmer and lemmatizer
+stemmer = PorterStemmer()
+
+column_name = 'review'
+# pre process
+def preprocess_text(text): 
+    
+    # Remove punctuation and numbers
+    text = ''.join([char for char in text if char not in punctuation and not char.isdigit()])
+    
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Tokenize the text
+    tokens = word_tokenize(text)
+    
+    # Remove stopwords
+    tokens = [token for token in tokens if token not in stop_words]
+    
+    # stemming or lemmatization
+    stemmed_tokens = [stemmer.stem(token) for token in tokens]  # Using stemming
+    
+    # Join tokens back into a single string
+    preprocessed_text = ' '.join(stemmed_tokens)  # Or use lemmatized_tokens if using lemmatization
+    
+    return preprocessed_text
+
+# Preprocess the review column
+train_imp[column_name] = train_imp[column_name].apply(preprocess_text)
+test_imp[column_name] = test_imp[column_name].apply(preprocess_text)
+
+# training on Word2Vec Model
+model = Word2Vec(train_df[column_name], min_count=1)
+
+# Extract review embeddings from train data
+dropped_indices = []  # List to store the indices of dropped ratings
+review_embeddings = []
+for idx,review in enumerate(train_df[column_name]):
+    embedding = []
+    for word in review:
+        if word in model.wv:
+            embedding.append(model.wv[word]) 
+    if len(embedding)>0:
+        review_embeddings.append(sum(embedding) / len(embedding))
+    else:
+        review_embeddings.append([])  # Assigning an empty list
+        dropped_indices.append(idx)
+
+# Extract review embeddings from test data
+test_dropped_indices = []  
+test_review_embeddings = []
+for idx,review in enumerate(test_df[column_name]):
+    test_embedding = []
+    for word in review:
+        if word in model.wv:
+            test_embedding.append(model.wv[word]) 
+    if len(test_embedding)>0:
+        test_review_embeddings.append(sum(test_embedding) / len(test_embedding))
+    else:
+        test_review_embeddings.append([])  
+        test_dropped_indices.append(idx)
+
+
+review_lengths = max([len(review) for review in review_embeddings])
+# Pad sequences to a fixed length
+padded_embeddings = pad_sequences(review_embeddings, padding='post', truncating='post', maxlen=100) #max_length
+test_padded_embeddings = pad_sequences(test_review_embeddings, padding='post', truncating='post', maxlen=100) 
+
+#Dimensionality reduction using PCA for word2vec and using Truncated SVD for Tfid
+desired_num_features = 100
+
+# Reduce Word2Vec embeddings
+pca_word2vec = PCA(n_components=desired_num_features)
+reduced_word2vec_embeddings = pca_word2vec.fit_transform(padded_embeddings)
+test_reduced_word2vec_embeddings = pca_word2vec.fit_transform(test_padded_embeddings)
+
+
+
+# Reduce TF-IDF features
+svd_tfidf = TruncatedSVD(n_components=100)
+reduced_tfidf_features = svd_tfidf.fit_transform(train_reviews_tfid)
+test_reduced_tfidf_features = svd_tfidf.fit_transform(test_reviews_tfid)
+
+# merging the embeddings in a dataframe
+train_imp = pd.concat([train_imp, pd.DataFrame(reduced_tfidf_features), pd.DataFrame(reduced_word2vec_embeddings)], axis=1)
+test_imp = pd.concat([test_imp, pd.DataFrame(test_reduced_tfidf_features), pd.DataFrame(test_reduced_word2vec_embeddings)], axis=1)
+
 
 ## Replacing the review column with the numerical data
 train_imp.drop('review', axis=1, inplace=True)
 test_imp.drop('review', axis=1, inplace=True)
-train_imp = pd.concat([train_imp, pd.DataFrame(train_reviews.toarray())], axis=1)
-test_imp = pd.concat([test_imp, pd.DataFrame(test_reviews.toarray())], axis=1)
 
 ## Encoding the categorical columns
 for i in ["drugName", "condition"]:
