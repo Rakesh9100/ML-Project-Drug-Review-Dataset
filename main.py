@@ -6,6 +6,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.model_selection import GridSearchCV
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import (
@@ -216,6 +217,31 @@ linear = LinearRegression()
 linear.fit(X_train, Y_train)
 line_train = linear.predict(X_train)
 line_test = linear.predict(X_test)
+
+linear_param_grid = {
+    'fit_intercept': [True, False],
+    'normalize': [True, False]
+}
+linear_grid = GridSearchCV(
+    estimator=LinearRegression(),
+    param_grid=linear_param_grid,
+    cv=5,
+    scoring='neg_mean_squared_error',
+    n_jobs=-1
+)
+linear_grid.fit(X_train, Y_train)
+best_linear_model = linear_grid.best_estimator_
+best_linear_params = linear_grid.best_params_
+linear_test_predictions = best_linear_model.predict(X_test)
+linear_test_mse = mean_squared_error(Y_test, linear_test_predictions)
+linear_test_r2 = r2_score(Y_test, linear_test_predictions)
+
+print("Best Linear Regression Model:")
+print("Parameters:", best_linear_params)
+print("MSE for testing:", linear_test_mse)
+print("R2 score for testing:", linear_test_r2)
+
+
 
 print("Linear Regression Metrics:")
 print("MSE for training: ", mean_squared_error(Y_train, line_train))
