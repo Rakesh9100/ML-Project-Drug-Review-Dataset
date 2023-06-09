@@ -8,6 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
+import gensim
 from sklearn.metrics import (
     mean_squared_error,
     r2_score,
@@ -19,6 +20,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
+from gensim.parsing.porter import PorterStemmer
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from imblearn.over_sampling import RandomOverSampler
 from keras.models import Sequential
@@ -34,14 +36,10 @@ dtypes = {
     "date": "string",
     "usefulCount": "int16",
 }
-train_df = pd.read_csv(
-    r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
-)
+train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 
 train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv(
-    r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
-)
+test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 
 ## Converting date column to datetime format
 train_df["date"], test_df["date"] = pd.to_datetime(
@@ -106,19 +104,103 @@ test_imp.columns = [
     "year",
 ]
 
-## Converting the text in the review column to numerical data
-vectorizer = TfidfVectorizer(stop_words="english", max_features=3000)
-train_reviews = vectorizer.fit_transform(train_imp["review"])
-test_reviews = vectorizer.transform(test_imp["review"])
+## Tokenization
+train_imp["tokenized_text"] = [
+    gensim.utils.simple_preprocess(line, deacc=True) for line in train_imp["review"]
+]
+test_imp["tokenized_text"] = [
+    gensim.utils.simple_preprocess(line, deacc=True) for line in test_imp["review"]
+]
 
-## Replacing the review column with the numerical data
-train_imp.drop("review", axis=1, inplace=True)
-test_imp.drop("review", axis=1, inplace=True)
-train_imp = pd.concat(
-    [train_imp, pd.DataFrame(train_reviews.toarray()).add_prefix("review")], axis=1
+## Stemming
+porter_stemmer = PorterStemmer()
+# Get the stemmed_tokens
+train_imp["stemmed_tokens"] = [
+    [porter_stemmer.stem(word) for word in tokens]
+    for tokens in train_imp["tokenized_text"]
+]
+test_imp["stemmed_tokens"] = [
+    [porter_stemmer.stem(word) for word in tokens]
+    for tokens in test_imp["tokenized_text"]
+]
+
+##Applying Word2vec
+from gensim.models import Word2Vec
+
+# Skip-gram model (sg = 1)
+size = 1000
+window = 3
+min_count = 1  # The minimum count of words to consider when training the model; words with occurrence less than this count will be ignored.
+workers = 3
+sg = 1  # The training algorithm, either CBOW(0) or skip gram(1). The default training algorithm is CBOW.
+
+## Merging values from both train and test dataframe
+stemmed_tokens_train = pd.Series(train_imp["stemmed_tokens"]).values
+stemmed_tokens_test = pd.Series(test_imp["stemmed_tokens"]).values
+stemmed_tokens_merged = np.append(stemmed_tokens_train, stemmed_tokens_test, axis=0)
+w2vmodel = Word2Vec(
+    stemmed_tokens_merged,
+    min_count=min_count,
+    vector_size=size,
+    workers=workers,
+    window=window,
+    sg=sg,
 )
-test_imp = pd.concat(
-    [test_imp, pd.DataFrame(test_reviews.toarray()).add_prefix("review")], axis=1
+
+### Store the vectors for train data in following file
+index = 0
+word2vec_filename = "train_review_word2vec.csv"
+with open(word2vec_filename, "w") as word2vec_file:
+    for i in range(129038):
+        model_vector = (
+            np.mean(
+                [w2vmodel.wv[token] for token in train_imp["stemmed_tokens"][i]], axis=0
+            )
+        ).tolist()
+        if index == 0:
+            header = ",".join(str(ele) for ele in range(1000))
+            word2vec_file.write(header)
+            word2vec_file.write("\n")
+        index += 1
+        # Check if the line exists else it is vector of zeros
+        if type(model_vector) is list:
+            line1 = ",".join([str(vector_element) for vector_element in model_vector])
+        word2vec_file.write(line1)
+        word2vec_file.write("\n")
+
+review_vector = pd.read_csv(r"train_review_word2vec.csv")
+
+### Store the vectors for test data in following file
+
+index = 0
+word2vec_filename = "test_review_word2vec.csv"
+with open(word2vec_filename, "w") as word2vec_file:
+    for i in range(53766):
+        model_vector = (
+            np.mean(
+                [w2vmodel.wv[token] for token in test_imp["stemmed_tokens"][i]], axis=0
+            )
+        ).tolist()
+        if index == 0:
+            header = ",".join(str(ele) for ele in range(1000))
+            word2vec_file.write(header)
+            word2vec_file.write("\n")
+        index += 1
+        # Check if the line exists else it is vector of zeros
+        if type(model_vector) is list:
+            line1 = ",".join([str(vector_element) for vector_element in model_vector])
+        word2vec_file.write(line1)
+        word2vec_file.write("\n")
+reivew_vector1 = pd.read_csv(r"test_review_word2vec.csv")
+
+## Joining vector and dropping necessary columns
+train_imp = pd.concat([train_imp, review_vector], axis="columns")
+train_imp.drop(
+    ["review", "tokenized_text", "stemmed_tokens"], axis="columns", inplace=True
+)
+test_imp = pd.concat([test_imp, reivew_vector1], axis="columns")
+test_imp.drop(
+    ["review", "tokenized_text", "stemmed_tokens"], axis="columns", inplace=True
 )
 
 ## Encoding the categorical columns
@@ -209,7 +291,6 @@ plt.title("Class Imbalance of Rating after OverSampling")
 plt.show()
 
 ##################################################
-
 
 ##### LinearRegression regression algorithm #####
 linear = LinearRegression()
@@ -430,7 +511,6 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title("Logistic Regression Confusion Matrix")
 plt.show()
 
-
 ##### Perceptron Model classification algorithm #####
 
 
@@ -443,7 +523,6 @@ mlpcls_test = mlpcls.predict(X_test)
 print("\nMulti Layer Perceptron Metrics:")
 print("Accuracy for training ", accuracy_score(mlpcls_train, Y_train))
 print("Accuracy for testing ", accuracy_score(mlpcls_test, Y_test))
-
 
 # Plotting the scatter plot of actual vs predicted values
 plt.scatter(Y_test, mlpcls_test, color="blue", label="Predicted Ratings")
@@ -515,7 +594,6 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(
 plt.title("Decision Tree Classifier - Confusion Matrix")
 plt.show()
 
-
 ##### Long Short-Term Memory algorithm #####
 
 # Define the model
@@ -524,7 +602,7 @@ model.add(LSTM(32, input_shape=(3006, 1)))
 model.add(Dense(1))
 
 # Reshape the X_train data
-X_train = X_train.values.reshape(129038, 3006, 1)
+X_train = X_train.values.reshape(129038, 1006, 1)
 
 # Reshape the y_train data
 Y_train = Y_train.values.reshape(129038, 1)
@@ -533,7 +611,7 @@ Y_train = Y_train.values.reshape(129038, 1)
 Y_test = Y_test.values.reshape(53766, 1)
 
 # Reshape the X_test data
-X_test = X_test.values.reshape(53766, 3006, 1)
+X_test = X_test.values.reshape(53766, 1006, 1)
 
 # Compile the model
 model.compile(loss="mse", optimizer="adam")
