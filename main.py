@@ -258,11 +258,14 @@ plt.show()
 ##### XGBOOST ####
 
 import xgboost
-model = xgboost.XGBRegressor(n_estimators=1000, max_depth=7, eta=0.1, subsample=0.7, colsample_bytree=0.8)
+
+model = xgboost.XGBRegressor(
+    n_estimators=1000, max_depth=7, eta=0.1, subsample=0.7, colsample_bytree=0.8
+)
 
 model.fit(X_train, Y_train)
-xg_train=model.predict(X_train)
-xg_test=model.predict(X_test)
+xg_train = model.predict(X_train)
+xg_test = model.predict(X_test)
 
 print("Xgboost Metrics:")
 print("MSE for training: ", mean_squared_error(Y_train, xg_train))
@@ -272,27 +275,28 @@ print("R2 score for testing: ", r2_score(Y_test, xg_test))
 
 # Plotting the scatter plot of predicted vs actual values for training data
 plt.scatter(Y_train, xg_train)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('XGBoost Regression - Training Data Scatter Plot')
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("XGBoost Regression - Training Data Scatter Plot")
 plt.show()
 
 # Plotting the scatter plot of predicted vs actual values for testing data
 plt.scatter(Y_test, xg_test)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('XGBoost Regression - Testing Data Scatter Plot')
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("XGBoost Regression - Testing Data Scatter Plot")
 plt.show()
 
 ##### LGBM ####
 
 
 from lightgbm import LGBMRegressor
+
 lgbmodel = LGBMRegressor()
 
 lgbmodel.fit(X_train, Y_train)
-lgb_train=lgbmodel.predict(X_train)
-lgb_test=lgbmodel.predict(X_test)
+lgb_train = lgbmodel.predict(X_train)
+lgb_test = lgbmodel.predict(X_test)
 
 print("LGBM Metrics:")
 print("MSE for training: ", mean_squared_error(Y_train, lgb_train))
@@ -302,26 +306,27 @@ print("R2 score for testing: ", r2_score(Y_test, lgb_test))
 
 # Plotting the scatter plot of predicted vs actual values for training data
 plt.scatter(Y_train, lgb_train)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('LGBM Regression - Training Data Scatter Plot')
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("LGBM Regression - Training Data Scatter Plot")
 plt.show()
 
 # Plotting the scatter plot of predicted vs actual values for testing data
 plt.scatter(Y_test, lgb_test)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('LGBM Regression - Testing Data Scatter Plot')
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("LGBM Regression - Testing Data Scatter Plot")
 plt.show()
 
 ##### SVR #####
 
 from sklearn import svm
+
 svm_model = svm.SVR()
 
 svm_model.fit(X_train, Y_train)
-svm_train=svm_model.predict(X_train)
-svm_test=svm_model.predict(X_test)
+svm_train = svm_model.predict(X_train)
+svm_test = svm_model.predict(X_test)
 
 print("SVM Regression Metrics:")
 print("MSE for training: ", mean_squared_error(Y_train, svm_train))
@@ -331,16 +336,16 @@ print("R2 score for testing: ", r2_score(Y_test, svm_test))
 
 # Plotting the scatter plot of predicted vs actual values for training data
 plt.scatter(Y_train, svm_train)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('LGBM Regression - Training Data Scatter Plot')
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("LGBM Regression - Training Data Scatter Plot")
 plt.show()
 
 # Plotting the scatter plot of predicted vs actual values for testing data
 plt.scatter(Y_test, svm_test)
-plt.xlabel('Actual Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('LGBM Regression - Testing Data Scatter Plot')
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("LGBM Regression - Testing Data Scatter Plot")
 plt.show()
 
 
