@@ -60,7 +60,9 @@ The project demonstrates the power of advanced machine learning techniques to ex
 <h2>Dataset Used📊</h2>
 
 The dataset used for this project is the famous Drug Review Dataset (Drugs.com) by UCI. The dataset can be found and downloaded from <a href = "https://archive-beta.ics.uci.edu/dataset/462/drug+review+dataset+drugs+com">here</a>.<br>
-The data provided is split into a train (75%) a test (25%) partition and stored in two .tsv (tab-separated-values) files, respectively.
+The data provided is split into a train (75%) a test (25%) partition and stored in two .tsv (tab-separated-values) files, respectively.<br>
+
+#### TARGET VARIABLE:- `Rating`
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
