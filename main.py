@@ -252,13 +252,6 @@ pd.plotting.scatter_matrix(train_imp[feature])
 pl.show()
 pl.hist(train_imp["drugName"],bins=50)
 pl.show()
-# Multiple Scatter and Histograms for training dataset
-feature=['drugName', 'condition','rating',
-       'usefulCount']
-pd.plotting.scatter_matrix(train_imp[feature])
-pl.show()
-pl.hist(train_imp["drugName"],bins=50)
-pl.show()
 ##### LinearRegression regression algorithm #####
 ##### EDA
 
