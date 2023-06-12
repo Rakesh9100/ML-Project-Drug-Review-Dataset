@@ -9,13 +9,6 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 import gensim
-from sklearn.metrics import (
-    mean_squared_error,
-    r2_score,
-    accuracy_score,
-    confusion_matrix,
-    ConfusionMatrixDisplay,
-)
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
@@ -25,6 +18,13 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from imblearn.over_sampling import RandomOverSampler
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
+from sklearn.metrics import (
+    mean_squared_error,
+    r2_score,
+    accuracy_score,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+)
 
 ## Reading the data
 dtypes = {
@@ -36,10 +36,15 @@ dtypes = {
     "date": "string",
     "usefulCount": "int16",
 }
-train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
+
+train_df = pd.read_csv(
+    r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+)
 
 train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
+test_df = pd.read_csv(
+    r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+)
 
 ## Converting date column to datetime format
 train_df["date"], test_df["date"] = pd.to_datetime(
@@ -93,6 +98,7 @@ train_imp.columns = [
     "month",
     "year",
 ]
+
 test_imp.columns = [
     "drugName",
     "condition",
@@ -124,7 +130,7 @@ test_imp["stemmed_tokens"] = [
     for tokens in test_imp["tokenized_text"]
 ]
 
-##Applying Word2vec
+## Applying Word2vec
 from gensim.models import Word2Vec
 
 # Skip-gram model (sg = 1)
@@ -147,7 +153,8 @@ w2vmodel = Word2Vec(
     sg=sg,
 )
 
-### Store the vectors for train data in following file
+## Store the vectors for train data in following file
+
 index = 0
 word2vec_filename = "train_review_word2vec.csv"
 with open(word2vec_filename, "w") as word2vec_file:
@@ -170,7 +177,7 @@ with open(word2vec_filename, "w") as word2vec_file:
 
 review_vector = pd.read_csv(r"train_review_word2vec.csv")
 
-### Store the vectors for test data in following file
+## Store the vectors for test data in following file
 
 index = 0
 word2vec_filename = "test_review_word2vec.csv"
@@ -284,7 +291,6 @@ plt.xlabel("Class")
 plt.ylabel("Count")
 plt.show()
 
-
 plt.figure(figsize=(10, 6))
 sns.countplot(x="rating", data=train_imp)
 plt.title("Class Imbalance of Rating after OverSampling")
@@ -293,6 +299,7 @@ plt.show()
 ##################################################
 
 ##### LinearRegression regression algorithm #####
+
 linear = LinearRegression()
 linear.fit(X_train, Y_train)
 line_train = linear.predict(X_train)
@@ -336,7 +343,8 @@ plt.xlabel("Predicted Ratings")
 plt.ylabel("Residuals")
 plt.title("Linear Regression - Testing Data Residual Plot")
 plt.show()
-##### XGBOOST ####
+
+##### XGBOOST algorithm ####
 
 import xgboost
 
@@ -368,8 +376,7 @@ plt.ylabel("Predicted Ratings")
 plt.title("XGBoost Regression - Testing Data Scatter Plot")
 plt.show()
 
-##### LGBM ####
-
+##### LGBM model algorithm ####
 
 from lightgbm import LGBMRegressor
 
@@ -399,7 +406,7 @@ plt.ylabel("Predicted Ratings")
 plt.title("LGBM Regression - Testing Data Scatter Plot")
 plt.show()
 
-##### SVR #####
+##### SVR algorithm #####
 
 from sklearn import svm
 
@@ -594,7 +601,7 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(
 plt.title("Decision Tree Classifier - Confusion Matrix")
 plt.show()
 
-##### Long Short-Term Memory algorithm #####
+##### Long Short-Term Memory(LSTM) algorithm #####
 
 # Define the model
 model = Sequential()
@@ -636,14 +643,13 @@ print("Root Mean Squared Error (RMSE):", rmse)
 
 # Plotting the scatter plot of predicted vs actual values for training data
 
-
 # Make predictions on training data
 train_predictions = model.predict(X_train)
 
 # Reshape the predictions
 train_predictions = train_predictions.reshape(train_predictions.shape[0])
 
-# Create a scatter plot
+# Created a scatter plot
 plt.scatter(Y_train, train_predictions)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
@@ -658,7 +664,7 @@ test_predictions = model.predict(X_test)
 # Reshape the predictions
 test_predictions = test_predictions.reshape(test_predictions.shape[0])
 
-# Create a scatter plot
+# Created a scatter plot
 plt.scatter(Y_test, test_predictions)
 
 plt.xlabel("Actual Values")
@@ -666,11 +672,10 @@ plt.ylabel("Predicted Values")
 plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
 
-
 ### TEXT PREPOCESSING , CREATION OF WORDCLOUDS ON THE REVIEW COLUMN , TEXT CLASSIFICATION (FEATURE EXTRACTION- BoW) , XGBoost MODEL ###
 
-
 # CHECKING FOR NULL VALUES , DUPLICATE VALUES ,DROPPING UNNAMED COLUMNS
+
 train_df.isnull().sum()
 train_df = train_df.dropna(subset=["condition"])
 train_df.isnull().sum()
@@ -678,14 +683,13 @@ train_df.isnull().sum()
 train_df.duplicated().sum()
 train_df.head()
 
-
 # TEXT PREPROCESSING
 
 # LOWER CASE
 # STRING PUNCTUATIONS
 # TOKENIZATION
 # STEMMING
-# all of this would be  done on the 'Reviews' column
+# All of this would be  done on the 'Reviews' column
 
 train_df["review"] = train_df["review"].str.lower()
 import string
@@ -729,7 +733,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 reviews = train_df["review"]
 vectorizer = CountVectorizer(max_features=1000)
 X_bow = vectorizer.fit_transform(reviews)
-
 
 # Fit and transform the reviews into a BoW feature matrix
 X_bow = vectorizer.fit_transform(reviews)
