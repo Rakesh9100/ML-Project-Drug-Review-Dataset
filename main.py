@@ -245,7 +245,16 @@ plt.xlabel("Drug Name")
 plt.ylabel("Ratings")
 plt.title("Scatter Plot: Drug Name vs Ratings (Testing Data)")
 plt.show()
-
+# Multiple Scatter and Histograms for training dataset
+feature = ["drugName", "condition", "rating", "usefulCount"]
+pd.plotting.scatter_matrix(train_imp[feature])
+plt.suptitle("Scatter Matrix For Training DataSet")
+plt.show()
+plt.title("Drug Name Histogram (Training Dataset)")
+plt.hist(train_imp["drugName"], bins=50)
+plt.xlabel("Bins")
+plt.ylabel("Drug Name")
+plt.show()
 ##### LinearRegression regression algorithm #####
 ##### EDA
 
