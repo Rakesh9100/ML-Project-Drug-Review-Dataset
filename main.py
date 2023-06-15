@@ -8,6 +8,13 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.ensemble import GradientBoostingRegressor, AdaBoostRegressor
+from sklearn.naive_bayes import GaussianNB
+import lightgbm as lgb
+import xgboost as xgb
 from sklearn.metrics import (
     mean_squared_error,
     r2_score,
@@ -287,13 +294,6 @@ plt.ylabel("Predicted Ratings")
 plt.title("XGBoost Regression - Testing Data Scatter Plot")
 plt.show()
 
-from sklearn.datasets import make_regression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.ensemble import GradientBoostingRegressor, AdaBoostRegressor
-from sklearn.naive_bayes import GaussianNB
-import lightgbm as lgb
-import xgboost as xgb
 
 # Generate synthetic regression data
 X, y = make_regression(n_samples=1000, n_features=10, noise=0.2, random_state=42)
@@ -312,18 +312,6 @@ print("MSE for training: ", mean_squared_error(y_train, gb_train_preds))
 print("MSE for testing: ", mean_squared_error(y_test, gb_test_preds))
 print("R2 score for training: ", r2_score(y_train, gb_train_preds))
 print("R2 score for testing: ", r2_score(y_test, gb_test_preds))
-
-######## XGBoost #########
-xgb_model = xgb.XGBRegressor(n_estimators=1000, max_depth=7, learning_rate=0.1, subsample=0.7, colsample_bytree=0.8)
-xgb_model.fit(X_train, y_train)
-xgb_train_preds = xgb_model.predict(X_train)
-xgb_test_preds = xgb_model.predict(X_test)
-
-print("XGBoost Metrics:")
-print("MSE for training: ", mean_squared_error(y_train, xgb_train_preds))
-print("MSE for testing: ", mean_squared_error(y_test, xgb_test_preds))
-print("R2 score for training: ", r2_score(y_train, xgb_train_preds))
-print("R2 score for testing: ", r2_score(y_test, xgb_test_preds))
 
 ######## LightGBM ########
 lgb_model = lgb.LGBMRegressor(n_estimators=100, max_depth=5, learning_rate=0.1)
