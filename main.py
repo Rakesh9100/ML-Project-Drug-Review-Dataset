@@ -38,10 +38,9 @@ dtypes = {
     "date": "string",
     "usefulCount": "int16",
 }
-train_df = pd.read_csv(r"ML-Project-Drug-Review-Dataset\datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
-print(train_df.head())
+train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv(r"ML-Project-Drug-Review-Dataset\datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
+test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 
 ## Converting date column to datetime format
 train_df["date"], test_df["date"] = pd.to_datetime(
@@ -239,6 +238,17 @@ plt.scatter(LabelEncoder().fit_transform(test_df.drugName), test_df.rating)
 plt.xlabel("Drug Name")
 plt.ylabel("Ratings")
 plt.title("Scatter Plot: Drug Name vs Ratings (Testing Data)")
+plt.show()
+
+# Multiple Scatter and Histograms for training dataset
+feature = ["drugName", "condition", "rating", "usefulCount"]
+pd.plotting.scatter_matrix(train_imp[feature])
+plt.suptitle("Scatter Matrix For Training DataSet")
+plt.show()
+plt.title("Drug Name Histogram (Training Dataset)")
+plt.hist(train_imp["drugName"], bins=50)
+plt.xlabel("Bins")
+plt.ylabel("Drug Name")
 plt.show()
 
 ##### LinearRegression regression algorithm #####
@@ -846,14 +856,14 @@ print("R2 score for testing: ", r2_score(Y_test, cb_preds))
 plt.scatter(Y_test,cb_preds)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
-plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
+plt.title("CatBoost: Predicted vs Actual (Testing Data)")
 plt.show()
 
 #training data
 plt.scatter(Y_train, cb_pred1)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
-plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
+plt.title("CatBoost: Predicted vs Actual (Testing Data)")
 plt.show()
 
 
