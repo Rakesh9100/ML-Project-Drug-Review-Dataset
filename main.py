@@ -856,14 +856,14 @@ print("R2 score for testing: ", r2_score(Y_test, cb_preds))
 plt.scatter(Y_test,cb_preds)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
-plt.title("CatBoost: Predicted vs Actual (Testing Data)")
+plt.title("CatBoost Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
 
 #training data
 plt.scatter(Y_train, cb_pred1)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
-plt.title("CatBoost: Predicted vs Actual (Testing Data)")
+plt.title("CatBoost Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
 
 
