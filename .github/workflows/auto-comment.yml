@@ -8,7 +8,6 @@ on:
   pull_request:
     types:
       - opened
-      - closed
 
 jobs:
   run:
@@ -20,7 +19,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           issuesOpened: |
             👋 Thank you for raising an issue! We will investigate and get back to you as soon as possible. @{{ author }}
-            <br>
             Please make sure you have given as much context as possible and similar issue has not been opened before.
 
       - name: Auto Comment on Issues Closed
@@ -36,19 +34,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           issuesAssigned: |
             Hello @{{ author }}, This issue has been assigned to you 🙌. You can start working on it.
-            
-      - name: Auto Comment on Pull Request Merged
-        uses: wow-actions/auto-comment@v1
-        with:
-          GITHUB_TOKEN: ${{ secrets.PR_TOKEN }}
-          pullRequestMerged: |
-            🎉 Congrats on getting your pull request merged to this repo! Thank you for the valuable contribution! 👏🎉 @{{ author }}
 
       - name: Auto Comment on Pull Request Opened
         uses: wow-actions/auto-comment@v1
         with:
           GITHUB_TOKEN: ${{ secrets.PR_TOKEN }}
           pullRequestOpened: |
-            Hello👋 @{{ author }}, Thank you for raising your pull request in this innovative project repo 🎉
-            <br>
-            Please make sure you have followed our contributing guidelines. We will review it as soon as possible.
+            Hello👋 @{{ author }}, Thank you for raising your pull request in this innovative project repo! 🎉
+            Please make sure you have followed our Contributing Guidelines. We will review it as soon as possible.
