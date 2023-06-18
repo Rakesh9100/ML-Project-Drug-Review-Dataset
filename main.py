@@ -863,11 +863,7 @@ plt.show()
 plt.scatter(Y_train, cb_pred1)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
-<<<<<<< HEAD
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
-=======
-plt.title("CatBoost Scatter Plot: Predicted vs Actual (Testing Data)")
->>>>>>> 19b6a157b90ebbc07073e00b112d1571663bb93a
 plt.show()
 
 
