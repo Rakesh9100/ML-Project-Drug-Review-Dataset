@@ -38,9 +38,13 @@ dtypes = {
     "date": "string",
     "usefulCount": "int16",
 }
-train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
+train_df = pd.read_csv(
+    r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+)
 train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
+test_df = pd.read_csv(
+    r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
+)
 
 ## Converting date column to datetime format
 train_df["date"], test_df["date"] = pd.to_datetime(
@@ -808,9 +812,10 @@ plt.show()
 
 # Hyper parameter tuning using optuna
 
+
 def objective(trial):
     params = {
-        "iterations": trial.suggest_int("iterations",500,10000),
+        "iterations": trial.suggest_int("iterations", 500, 10000),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 0.1),
         "depth": trial.suggest_int("depth", 1, 10),
         "subsample": trial.suggest_float("subsample", 0.25, 0.99),
@@ -824,6 +829,7 @@ def objective(trial):
     rmse = mean_squared_error(Y_test, predictions, squared=False)
     return rmse
 
+
 study = optuna.create_study(direction="minimize")
 study.optimize(objective, n_trials=50)
 print("Best trial:")
@@ -833,37 +839,40 @@ print("  Params: ")
 for key, value in trial.params.items():
     print("    {}: {}".format(key, value))
 
-#CatBoost with hyper-parameters found using Optuna
+# CatBoost with hyper-parameters found using Optuna
 
-cb_rge_1 = cbt.CatBoostRegressor(iterations=9458,learning_rate=0.0563603538149542,depth=8,
-                                subsample=0.7522145960722497,colsample_bylevel=0.9788529170933132,
-                                min_data_in_leaf=69)
+cb_rge_1 = cbt.CatBoostRegressor(
+    iterations=9458,
+    learning_rate=0.0563603538149542,
+    depth=8,
+    subsample=0.7522145960722497,
+    colsample_bylevel=0.9788529170933132,
+    min_data_in_leaf=69,
+)
 
 
 cb_rge_1.fit(X_train, Y_train)
 
-cb_preds=cb_rge_1.predict(X_test)
-cb_pred1=cb_rge_1.predict(X_train)
+cb_preds = cb_rge_1.predict(X_test)
+cb_pred1 = cb_rge_1.predict(X_train)
 
 print("MSE for training: ", mean_squared_error(Y_train, cb_pred1))
 print("MSE for testing: ", mean_squared_error(Y_test, cb_preds))
 print("R2 score for training: ", r2_score(Y_train, cb_pred1))
 print("R2 score for testing: ", r2_score(Y_test, cb_preds))
 
-#scatter plot
+# scatter plot
 
-#testing data
-plt.scatter(Y_test,cb_preds)
+# testing data
+plt.scatter(Y_test, cb_preds)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
 
-#training data
+# training data
 plt.scatter(Y_train, cb_pred1)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
 plt.show()
-
-
