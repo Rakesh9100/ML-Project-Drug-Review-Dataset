@@ -6,9 +6,18 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
+import catboost as cbt
+import optuna
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 import gensim
+from sklearn.metrics import (
+    mean_squared_error,
+    r2_score,
+    accuracy_score,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+)
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 import seaborn as sns
@@ -18,13 +27,6 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from imblearn.over_sampling import RandomOverSampler
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
-from sklearn.metrics import (
-    mean_squared_error,
-    r2_score,
-    accuracy_score,
-    confusion_matrix,
-    ConfusionMatrixDisplay,
-)
 
 ## Reading the data
 dtypes = {
@@ -36,15 +38,9 @@ dtypes = {
     "date": "string",
     "usefulCount": "int16",
 }
-
-train_df = pd.read_csv(
-    r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
-)
-
+train_df = pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 train_df = train_df.sample(frac=0.8, random_state=42)
-test_df = pd.read_csv(
-    r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
-)
+test_df = pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes)
 
 ## Converting date column to datetime format
 train_df["date"], test_df["date"] = pd.to_datetime(
@@ -98,7 +94,6 @@ train_imp.columns = [
     "month",
     "year",
 ]
-
 test_imp.columns = [
     "drugName",
     "condition",
@@ -130,7 +125,7 @@ test_imp["stemmed_tokens"] = [
     for tokens in test_imp["tokenized_text"]
 ]
 
-## Applying Word2vec
+##Applying Word2vec
 from gensim.models import Word2Vec
 
 # Skip-gram model (sg = 1)
@@ -153,8 +148,7 @@ w2vmodel = Word2Vec(
     sg=sg,
 )
 
-## Store the vectors for train data in following file
-
+### Store the vectors for train data in following file
 index = 0
 word2vec_filename = "train_review_word2vec.csv"
 with open(word2vec_filename, "w") as word2vec_file:
@@ -177,7 +171,7 @@ with open(word2vec_filename, "w") as word2vec_file:
 
 review_vector = pd.read_csv(r"train_review_word2vec.csv")
 
-## Store the vectors for test data in following file
+### Store the vectors for test data in following file
 
 index = 0
 word2vec_filename = "test_review_word2vec.csv"
@@ -302,6 +296,7 @@ plt.xlabel("Class")
 plt.ylabel("Count")
 plt.show()
 
+
 plt.figure(figsize=(10, 6))
 sns.countplot(x="rating", data=train_imp)
 plt.title("Class Imbalance of Rating after OverSampling")
@@ -310,7 +305,6 @@ plt.show()
 ##################################################
 
 ##### LinearRegression regression algorithm #####
-
 linear = LinearRegression()
 linear.fit(X_train, Y_train)
 line_train = linear.predict(X_train)
@@ -354,8 +348,7 @@ plt.xlabel("Predicted Ratings")
 plt.ylabel("Residuals")
 plt.title("Linear Regression - Testing Data Residual Plot")
 plt.show()
-
-##### XGBOOST algorithm ####
+##### XGBOOST ####
 
 import xgboost
 
@@ -387,7 +380,8 @@ plt.ylabel("Predicted Ratings")
 plt.title("XGBoost Regression - Testing Data Scatter Plot")
 plt.show()
 
-##### LGBM model algorithm ####
+##### LGBM ####
+
 
 from lightgbm import LGBMRegressor
 
@@ -417,7 +411,7 @@ plt.ylabel("Predicted Ratings")
 plt.title("LGBM Regression - Testing Data Scatter Plot")
 plt.show()
 
-##### SVR algorithm #####
+##### SVR #####
 
 from sklearn import svm
 
@@ -612,7 +606,7 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(
 plt.title("Decision Tree Classifier - Confusion Matrix")
 plt.show()
 
-##### Long Short-Term Memory(LSTM) algorithm #####
+##### Long Short-Term Memory algorithm #####
 
 # Define the model
 model = Sequential()
@@ -654,13 +648,14 @@ print("Root Mean Squared Error (RMSE):", rmse)
 
 # Plotting the scatter plot of predicted vs actual values for training data
 
+
 # Make predictions on training data
 train_predictions = model.predict(X_train)
 
 # Reshape the predictions
 train_predictions = train_predictions.reshape(train_predictions.shape[0])
 
-# Created a scatter plot
+# Create a scatter plot
 plt.scatter(Y_train, train_predictions)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
@@ -675,7 +670,7 @@ test_predictions = model.predict(X_test)
 # Reshape the predictions
 test_predictions = test_predictions.reshape(test_predictions.shape[0])
 
-# Created a scatter plot
+# Create a scatter plot
 plt.scatter(Y_test, test_predictions)
 
 plt.xlabel("Actual Values")
@@ -683,10 +678,11 @@ plt.ylabel("Predicted Values")
 plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
 
+
 ### TEXT PREPOCESSING , CREATION OF WORDCLOUDS ON THE REVIEW COLUMN , TEXT CLASSIFICATION (FEATURE EXTRACTION- BoW) , XGBoost MODEL ###
 
-# CHECKING FOR NULL VALUES , DUPLICATE VALUES ,DROPPING UNNAMED COLUMNS
 
+# CHECKING FOR NULL VALUES , DUPLICATE VALUES ,DROPPING UNNAMED COLUMNS
 train_df.isnull().sum()
 train_df = train_df.dropna(subset=["condition"])
 train_df.isnull().sum()
@@ -694,13 +690,14 @@ train_df.isnull().sum()
 train_df.duplicated().sum()
 train_df.head()
 
+
 # TEXT PREPROCESSING
 
 # LOWER CASE
 # STRING PUNCTUATIONS
 # TOKENIZATION
 # STEMMING
-# All of this would be  done on the 'Reviews' column
+# all of this would be  done on the 'Reviews' column
 
 train_df["review"] = train_df["review"].str.lower()
 import string
@@ -744,6 +741,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 reviews = train_df["review"]
 vectorizer = CountVectorizer(max_features=1000)
 X_bow = vectorizer.fit_transform(reviews)
+
 
 # Fit and transform the reviews into a BoW feature matrix
 X_bow = vectorizer.fit_transform(reviews)
@@ -806,3 +804,66 @@ plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
+
+
+# Hyper parameter tuning using optuna
+
+def objective(trial):
+    params = {
+        "iterations": trial.suggest_int("iterations",500,10000),
+        "learning_rate": trial.suggest_float("learning_rate", 1e-3, 0.1),
+        "depth": trial.suggest_int("depth", 1, 10),
+        "subsample": trial.suggest_float("subsample", 0.25, 0.99),
+        "colsample_bylevel": trial.suggest_float("colsample_bylevel", 0.05, 1.0),
+        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 1, 69),
+    }
+
+    model = cbt.CatBoostRegressor(**params, silent=True)
+    model.fit(X_train, Y_train)
+    predictions = model.predict(X_test)
+    rmse = mean_squared_error(Y_test, predictions, squared=False)
+    return rmse
+
+study = optuna.create_study(direction="minimize")
+study.optimize(objective, n_trials=50)
+print("Best trial:")
+trial = study.best_trial
+print("  Value: ", trial.value)
+print("  Params: ")
+for key, value in trial.params.items():
+    print("    {}: {}".format(key, value))
+
+#CatBoost with hyper-parameters found using Optuna
+
+cb_rge_1 = cbt.CatBoostRegressor(iterations=9458,learning_rate=0.0563603538149542,depth=8,
+                                subsample=0.7522145960722497,colsample_bylevel=0.9788529170933132,
+                                min_data_in_leaf=69)
+
+
+cb_rge_1.fit(X_train, Y_train)
+
+cb_preds=cb_rge_1.predict(X_test)
+cb_pred1=cb_rge_1.predict(X_train)
+
+print("MSE for training: ", mean_squared_error(Y_train, cb_pred1))
+print("MSE for testing: ", mean_squared_error(Y_test, cb_preds))
+print("R2 score for training: ", r2_score(Y_train, cb_pred1))
+print("R2 score for testing: ", r2_score(Y_test, cb_preds))
+
+#scatter plot
+
+#testing data
+plt.scatter(Y_test,cb_preds)
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.title("CatBoost Scatter Plot: Predicted vs Actual (Testing Data)")
+plt.show()
+
+#training data
+plt.scatter(Y_train, cb_pred1)
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
+plt.show()
+
+
