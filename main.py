@@ -667,6 +667,63 @@ plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
 
 
+### Support Vector Machine Model
+##  Traiing 
+from sklearn.svm import SVC
+model = SVC()
+
+model.fit(X_train, Y_train)
+
+model.score(X_test, Y_test)
+
+model.predict([[4.8,3.0,1.5,0.3]])
+
+## 1 Tuning
+## Regularization (C)
+
+model_C = SVC(C=1)
+model_C.fit(X_train, Y_train)
+model_C.score(X_test, Y_test)
+
+model_C = SVC(C=10)
+model_C.fit(X_train, y_train)
+model_C.score(X_test, y_test)
+
+## 2 Gamma 
+model_g = SVC(gamma=10)
+model_g.fit(X_train, Y_train)
+model_g.score(X_test, Y_test)
+
+## 3 Kernel
+
+model_linear_kernal = SVC(kernel='linear')
+model_linear_kernal.fit(X_train, Y_train)
+model_linear_kernal.score(X_test, Y_test)
+
+
+## Random Forect 
+## Training 
+from sklearn.ensemble import RandomForestClassifier
+model = RandomForestClassifier(n_estimators=20)
+model.fit(X_train, Y_train)
+model.score(X_test, Y_test)
+y_predicted = model.predict(X_test)
+
+##Confusion Matrics
+
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(Y_test, y_predicted)
+cm
+
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+import seaborn as sn
+plt.figure(figsize=(10,7))
+sn.heatmap(cm, annot=True)
+plt.xlabel('Predicted')
+plt.ylabel('Truth')
+
 ### TEXT PREPOCESSING , CREATION OF WORDCLOUDS ON THE REVIEW COLUMN , TEXT CLASSIFICATION (FEATURE EXTRACTION- BoW) , XGBoost MODEL ###
 
 
