@@ -352,6 +352,101 @@ plt.xlabel("Predicted Ratings")
 plt.ylabel("Residuals")
 plt.title("Linear Regression - Testing Data Residual Plot")
 plt.show()
+
+
+##### ANN algorithm #####
+
+
+
+from sklearn.neural_network import MLPClassifier
+model = MLPClassifier(solver='lbfgs',alpha=1e-5,hidden_layer_sizes=(5, 2), random_state=1)
+model.fit(X_train,Y_train)
+#Y_predict = model.predict(X_test)
+model_train = model.predict(X_train)
+model_test = model.predict(X_test)
+train_accuracy=accuracy_score(model_train, Y_train)
+test_accuracy=accuracy_score(model_test, Y_test)
+print("\nANN METRICS:")
+print("Accuracy for training ", train_accuracy)
+print("Accuracy for testing ", test_accuracy)
+print("MSE for training: ", mean_squared_error(Y_train, model_train))
+print("MSE for testing: ", mean_squared_error(Y_test, model_test))
+print("R2 score for training: ", r2_score(Y_train, model_train))
+print("R2 score for testing: ", r2_score(Y_test, model_test))
+
+# Plotting the scatter plot of predicted vs actual values for training data
+plt.scatter(Y_train, model_train)
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("ANN - Training Data Scatter Plot")
+plt.show()
+
+# Plotting the scatter plot of predicted vs actual values for testing data
+plt.scatter(Y_test, model_test)
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("ANN - Testing Data Scatter Plot")
+plt.show()
+
+#Plotting the Accuracy Plot
+plt.plot(["Training", "Testing"], [train_accuracy, test_accuracy], marker="o")
+plt.title("ANN Accuracy")
+plt.xlabel("Dataset")
+plt.ylabel("Accuracy")
+plt.show()
+
+# Plotting the confusion matrix
+cm = confusion_matrix(Y_test, model_test, labels=model.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_).plot()
+plt.title("ANN Confusion Matrix")
+plt.show()
+
+##### ADABOOST algorithm #####
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.datasets import make_classification
+X_train,Y_train = make_classification(n_samples=1006, n_features=1006,n_informative=2, n_redundant=0,random_state=0, shuffle=False)
+clf = AdaBoostClassifier(n_estimators=100, random_state=0)
+clf.fit(X_train,Y_train)
+ada_train = clf.predict(X_train)
+ada_test = clf.predict(X_test)
+ada_train_accuracy=accuracy_score(ada_train, Y_train)
+ada_test_accuracy=accuracy_score(ada_test, Y_test)
+print("\nAdaBOOST METRICS:")
+print("Accuracy for training ", ada_train_accuracy)
+print("Accuracy for testing ", ada_test_accuracy)
+print("MSE for training: ", mean_squared_error(Y_train, ada_train))
+print("MSE for testing: ", mean_squared_error(Y_test, ada_test))
+print("R2 score for training: ", r2_score(Y_train, ada_train))
+print("R2 score for testing: ", r2_score(Y_test, ada_test))
+
+# Plotting the scatter plot of predicted vs actual values for training data
+plt.scatter(Y_train, ada_train)
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("AdaBoost - Training Data Scatter Plot")
+plt.show()
+
+# Plotting the scatter plot of predicted vs actual values for testing data
+plt.scatter(Y_test, ada_test)
+plt.xlabel("Actual Ratings")
+plt.ylabel("Predicted Ratings")
+plt.title("AdaBoost - Testing Data Scatter Plot")
+plt.show()
+
+#Plotting the Accuracy Plot
+plt.plot(["Training", "Testing"], [ada_train_accuracy, ada_test_accuracy], marker="o")
+plt.title("AdaBoost Accuracy")
+plt.xlabel("Dataset")
+plt.ylabel("Accuracy")
+plt.show()
+
+# Plotting the confusion matrix
+cm = confusion_matrix(Y_test, ada_test, labels=clf.classes_)
+ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_).plot()
+plt.title("AdaBoost Confusion Matrix")
+plt.show()
+
+
 ##### XGBOOST ####
 
 import xgboost
