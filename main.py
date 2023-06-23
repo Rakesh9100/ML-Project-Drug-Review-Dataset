@@ -356,15 +356,17 @@ plt.show()
 ##### ANN algorithm #####
 
 
-
 from sklearn.neural_network import MLPClassifier
-model = MLPClassifier(solver='lbfgs',alpha=1e-5,hidden_layer_sizes=(5, 2), random_state=1)
-model.fit(X_train,Y_train)
-#Y_predict = model.predict(X_test)
+
+model = MLPClassifier(
+    solver="lbfgs", alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1
+)
+model.fit(X_train, Y_train)
+# Y_predict = model.predict(X_test)
 model_train = model.predict(X_train)
 model_test = model.predict(X_test)
-train_accuracy=accuracy_score(model_train, Y_train)
-test_accuracy=accuracy_score(model_test, Y_test)
+train_accuracy = accuracy_score(model_train, Y_train)
+test_accuracy = accuracy_score(model_test, Y_test)
 print("\nANN METRICS:")
 print("Accuracy for training ", train_accuracy)
 print("Accuracy for testing ", test_accuracy)
@@ -387,7 +389,7 @@ plt.ylabel("Predicted Ratings")
 plt.title("ANN - Testing Data Scatter Plot")
 plt.show()
 
-#Plotting the Accuracy Plot
+# Plotting the Accuracy Plot
 plt.plot(["Training", "Testing"], [train_accuracy, test_accuracy], marker="o")
 plt.title("ANN Accuracy")
 plt.xlabel("Dataset")
@@ -403,13 +405,21 @@ plt.show()
 ##### ADABOOST algorithm #####
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.datasets import make_classification
-X_train,Y_train = make_classification(n_samples=1006, n_features=1006,n_informative=2, n_redundant=0,random_state=0, shuffle=False)
+
+X_train, Y_train = make_classification(
+    n_samples=1006,
+    n_features=1006,
+    n_informative=2,
+    n_redundant=0,
+    random_state=0,
+    shuffle=False,
+)
 clf = AdaBoostClassifier(n_estimators=100, random_state=0)
-clf.fit(X_train,Y_train)
+clf.fit(X_train, Y_train)
 ada_train = clf.predict(X_train)
 ada_test = clf.predict(X_test)
-ada_train_accuracy=accuracy_score(ada_train, Y_train)
-ada_test_accuracy=accuracy_score(ada_test, Y_test)
+ada_train_accuracy = accuracy_score(ada_train, Y_train)
+ada_test_accuracy = accuracy_score(ada_test, Y_test)
 print("\nAdaBOOST METRICS:")
 print("Accuracy for training ", ada_train_accuracy)
 print("Accuracy for testing ", ada_test_accuracy)
@@ -432,7 +442,7 @@ plt.ylabel("Predicted Ratings")
 plt.title("AdaBoost - Testing Data Scatter Plot")
 plt.show()
 
-#Plotting the Accuracy Plot
+# Plotting the Accuracy Plot
 plt.plot(["Training", "Testing"], [ada_train_accuracy, ada_test_accuracy], marker="o")
 plt.title("AdaBoost Accuracy")
 plt.xlabel("Dataset")
@@ -507,6 +517,7 @@ plt.xlabel("Actual Ratings")
 plt.ylabel("Predicted Ratings")
 plt.title("LGBM Regression - Testing Data Scatter Plot")
 plt.show()
+
 
 ##### SVR #####
 
