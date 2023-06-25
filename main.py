@@ -136,6 +136,7 @@ plt.ylabel('Residuals')
 plt.title('Linear Regression - Testing Data Residual Plot')
 plt.show()
 
+
 ##### Randomized Random Forest Regression algorithm #####
 
 param = [
@@ -187,6 +188,37 @@ plt.hlines(y=0, xmin=0, xmax=10)
 plt.xlabel('Predicted Ratings')
 plt.ylabel('Residuals')
 plt.title('Randomized RandomForestRegressor - Testing Data Residual Plot')
+plt.show()
+
+##### GriSearch LogisticRegression classification algorithm #####
+param = [
+    {'penalty': ['l1', 'l2', 'elasticnet', None],
+     'solver': ['lbfgs', 'liblinear', 'newton-cg', 'newton-cholesky']
+     },
+]
+
+logi=LogisticRegression()
+gs_logi = GridSearchCV(logi, param, cv=2, n_jobs=-1, verbose=1)
+gs_logi.fit(X_train, Y_train)
+logi_train=gs_logi.predict(X_train)
+logi_test=gs_logi.predict(X_test)
+
+train_accuracy = accuracy_score(logi_train, Y_train)
+test_accuracy = accuracy_score(logi_test, Y_test)
+print("\nLogistic Regression Metrics:")
+print("Accuracy for training: ", train_accuracy)
+print("Accuracy for testing: ", test_accuracy)
+
+# Plotting the accuracy plot
+plt.plot(['Training', 'Testing'], [train_accuracy, test_accuracy], marker='o')
+plt.title('Logistic Regression Accuracy')
+plt.xlabel('Dataset')
+plt.ylabel('Accuracy')
+plt.show()
+
+# Plotting the confusion matrix
+ConfusionMatrixDisplay.from_estimator(gs_logi, X_test, Y_test)
+plt.title('Logistic Regression Confusion Matrix')
 plt.show()
 
 ##### LogisticRegression classification algorithm #####
