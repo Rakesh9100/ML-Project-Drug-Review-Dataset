@@ -10,10 +10,7 @@ import catboost as cbt
 import optuna
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
-<<<<<<< HEAD
-=======
 import gensim
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 from sklearn.metrics import (
     mean_squared_error,
     r2_score,
@@ -44,10 +41,7 @@ dtypes = {
 train_df = pd.read_csv(
     r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
 )
-<<<<<<< HEAD
 
-=======
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 train_df = train_df.sample(frac=0.8, random_state=42)
 test_df = pd.read_csv(
     r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes
@@ -116,21 +110,6 @@ test_imp.columns = [
     "year",
 ]
 
-<<<<<<< HEAD
-## Converting the text in the review column to numerical data
-vectorizer = TfidfVectorizer(stop_words="english", max_features=3000)
-train_reviews = vectorizer.fit_transform(train_imp["review"])
-test_reviews = vectorizer.transform(test_imp["review"])
-
-## Replacing the review column with the numerical data
-train_imp.drop("review", axis=1, inplace=True)
-test_imp.drop("review", axis=1, inplace=True)
-train_imp = pd.concat(
-    [train_imp, pd.DataFrame(train_reviews.toarray()).add_prefix("review")], axis=1
-)
-test_imp = pd.concat(
-    [test_imp, pd.DataFrame(test_reviews.toarray()).add_prefix("review")], axis=1
-=======
 ## Tokenization
 train_imp["tokenized_text"] = [
     gensim.utils.simple_preprocess(line, deacc=True) for line in train_imp["review"]
@@ -228,7 +207,6 @@ train_imp.drop(
 test_imp = pd.concat([test_imp, reivew_vector1], axis="columns")
 test_imp.drop(
     ["review", "tokenized_text", "stemmed_tokens"], axis="columns", inplace=True
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 )
 
 ## Encoding the categorical columns
@@ -279,8 +257,6 @@ plt.ylabel("Drug Name")
 plt.show()
 
 ##### LinearRegression regression algorithm #####
-<<<<<<< HEAD
-=======
 ##### EDA
 
 ##### 1) Summary and Stats
@@ -334,7 +310,6 @@ plt.show()
 ##################################################
 
 ##### LinearRegression regression algorithm #####
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 linear = LinearRegression()
 linear.fit(X_train, Y_train)
 line_train = linear.predict(X_train)
@@ -377,12 +352,9 @@ plt.hlines(y=0, xmin=0, xmax=10)
 plt.xlabel("Predicted Ratings")
 plt.ylabel("Residuals")
 plt.title("Linear Regression - Testing Data Residual Plot")
-<<<<<<< HEAD
-=======
 plt.show()
 
 ##### ANN algorithm #####
-
 
 from sklearn.neural_network import MLPClassifier
 
@@ -575,7 +547,6 @@ plt.scatter(Y_test, svm_test)
 plt.xlabel("Actual Ratings")
 plt.ylabel("Predicted Ratings")
 plt.title("LGBM Regression - Testing Data Scatter Plot")
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 plt.show()
 
 
@@ -704,10 +675,6 @@ mlpcls_test = mlpcls.predict(X_test)
 print("\nMulti Layer Perceptron Metrics:")
 print("Accuracy for training ", accuracy_score(mlpcls_train, Y_train))
 print("Accuracy for testing ", accuracy_score(mlpcls_test, Y_test))
-<<<<<<< HEAD
-
-=======
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 
 # Plotting the scatter plot of actual vs predicted values
 plt.scatter(Y_test, mlpcls_test, color="blue", label="Predicted Ratings")
@@ -796,11 +763,7 @@ Y_train = Y_train.values.reshape(129038, 1)
 Y_test = Y_test.values.reshape(53766, 1)
 
 # Reshape the X_test data
-<<<<<<< HEAD
-X_test = X_test.values.reshape(53766, 3006, 1)
-=======
 X_test = X_test.values.reshape(53766, 1006, 1)
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 
 # Compile the model
 model.compile(loss="mse", optimizer="adam")
@@ -849,17 +812,10 @@ test_predictions = test_predictions.reshape(test_predictions.shape[0])
 
 # Create a scatter plot
 plt.scatter(Y_test, test_predictions)
-<<<<<<< HEAD
-=======
-
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("Scatter Plot: Predicted vs Actual (Testing Data)")
 plt.show()
-<<<<<<< HEAD
-=======
-
 
 ### TEXT PREPOCESSING , CREATION OF WORDCLOUDS ON THE REVIEW COLUMN , TEXT CLASSIFICATION (FEATURE EXTRACTION- BoW) , XGBoost MODEL ###
 
@@ -1054,4 +1010,3 @@ plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
 plt.show()
->>>>>>> e52d34bcb9eef7844769c49a865d75b90670db24
