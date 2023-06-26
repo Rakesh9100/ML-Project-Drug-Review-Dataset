@@ -134,8 +134,8 @@ plt.legend()
 plt.show()
 
 # Plotting the residual plot for testing data
-# print(arima_test.shape)
-# print((arima_test-Y_test).shape)
+print(arima_test.shape)
+print((arima_test-Y_test).shape)
 plt.scatter(arima_test, Y_test, c='g', s=40, alpha=0.5)
 plt.hlines(y=0, xmin=0, xmax=10)
 plt.xlabel('Predicted Ratings')

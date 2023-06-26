@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression, Perceptron
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, plot_confusion_matrix ,mean_absolute_error
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, plot_confusion_matrix 
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -75,6 +75,8 @@ test_imp[['rating']] = test_imp[['rating']].astype('float16')
 train_imp[['day', 'month']] = train_imp[['day', 'month']].astype('int8')
 test_imp[['day', 'month']] = test_imp[['day', 'month']].astype('int8')
 
+#print(train_imp.iloc[:,:15].dtypes)
+#print(test_imp.iloc[:,:15].dtypes)
 
 ## Splitting the train and test datasets into feature variables
 X_train, Y_train = train_imp.drop('rating', axis=1), train_imp['rating']
@@ -88,60 +90,30 @@ train_ratings = train_imp['rating']
 test_ratings = test_imp['rating']
 
 # Fit an ARIMA model
-model = ARIMA(Y_train, order=(1, 1, 1))
+model = ARIMA(train_ratings, order=(1, 1, 1))
 model_fit = model.fit()
 
 # Make predictions on the test data
-arima_test = model_fit.forecast(steps=len(X_test))
-arima_train= model_fit.forecast(steps=len(X_train))
+predictions = model_fit.forecast(steps=len(test_ratings))[0]
 
 # Evaluate the model
-mse_train= mean_squared_error(Y_train,arima_train)
-mse_test = mean_squared_error(Y_test, arima_test)
-r2_test = r2_score(Y_test, arima_test)
-r2_train =r2_score(Y_train,arima_train) 
-rmse_test = np.sqrt(mse_test)
-mae_test = mean_absolute_error(Y_test,arima_test)
+mse = mean_squared_error(test_ratings, predictions)
+r2 = r2_score(test_ratings, predictions)
 
 # Print evaluation metrics
-print("ARIMA RESULTS")
-print("Mean Squared train:", mse_train)
-print("R-squared train:", r2_test)
-print("Mean Squared test:", mse_test)
-print("R-squared test:", r2_test)
-print("rmse test:",rmse_test)
-print("mae test:",mae_test)
+print("Mean Squared Error:", mse)
+print("R-squared Score:", r2)
 
-plt.scatter(Y_train,arima_train)
-plt.xlabel("Actual")
-plt.ylabel("Predicted Arima")
-plt.title("ARima Model: Training data Scatter plot")
-# plt.show()
-plt.scatter(Y_test,arima_test)
-plt.xlabel("Actual")
-plt.ylabel("Predicted Arima")
-plt.title("ARima Model: Testing data Scatter plot")
-plt.show()
-# Plotting the scatter plot of predicted vs true values for both training and testing sets
-plt.figure(figsize=(8,6))
-plt.scatter(Y_train, arima_train, alpha=0.3, label='Training')
-plt.scatter(Y_test, arima_test, alpha=0.3, label='Testing')
-plt.plot([0,10], [0,10], linestyle='--', color='k', label='Perfect prediction')
-plt.xlabel('True Ratings')
-plt.ylabel('Predicted Ratings')
-plt.title('ARima model - Training and Testing Sets Scatter Plot')
+# Optionally, visualize the predictions
+plt.plot(test_ratings, label='Actual')
+plt.plot(predictions, label='ARIMA Predictions')
+plt.xlabel('Time')
+plt.ylabel('Rating')
 plt.legend()
 plt.show()
 
-# Plotting the residual plot for testing data
-# print(arima_test.shape)
-# print((arima_test-Y_test).shape)
-plt.scatter(arima_test, Y_test, c='g', s=40, alpha=0.5)
-plt.hlines(y=0, xmin=0, xmax=10)
-plt.xlabel('Predicted Ratings')
-plt.ylabel('Residuals')
-plt.title('ARima Model - Testing Data Residual Plot')
-plt.show()
+
+
 
 
 

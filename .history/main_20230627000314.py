@@ -96,7 +96,6 @@ arima_test = model_fit.forecast(steps=len(X_test))
 arima_train= model_fit.forecast(steps=len(X_train))
 
 # Evaluate the model
-mse_train= mean_squared_error(Y_train,arima_train)
 mse_test = mean_squared_error(Y_test, arima_test)
 r2_test = r2_score(Y_test, arima_test)
 r2_train =r2_score(Y_train,arima_train) 
@@ -104,13 +103,11 @@ rmse_test = np.sqrt(mse_test)
 mae_test = mean_absolute_error(Y_test,arima_test)
 
 # Print evaluation metrics
-print("ARIMA RESULTS")
-print("Mean Squared train:", mse_train)
+print("Mean Squared train:", mse_test)
 print("R-squared train:", r2_test)
 print("Mean Squared test:", mse_test)
 print("R-squared test:", r2_test)
-print("rmse test:",rmse_test)
-print("mae test:",mae_test)
+
 
 plt.scatter(Y_train,arima_train)
 plt.xlabel("Actual")
@@ -134,8 +131,8 @@ plt.legend()
 plt.show()
 
 # Plotting the residual plot for testing data
-# print(arima_test.shape)
-# print((arima_test-Y_test).shape)
+print(arima_test.shape)
+print((arima_test-Y_test).shape)
 plt.scatter(arima_test, Y_test, c='g', s=40, alpha=0.5)
 plt.hlines(y=0, xmin=0, xmax=10)
 plt.xlabel('Predicted Ratings')
