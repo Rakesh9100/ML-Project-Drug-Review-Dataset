@@ -60,7 +60,9 @@ The project demonstrates the power of advanced machine learning techniques to ex
 <h2>Dataset Used📊</h2>
 
 The dataset used for this project is the famous Drug Review Dataset (Drugs.com) by UCI. The dataset can be found and downloaded from <a href = "https://archive-beta.ics.uci.edu/dataset/462/drug+review+dataset+drugs+com">here</a>.<br>
-The data provided is split into a train (75%) a test (25%) partition and stored in two .tsv (tab-separated-values) files, respectively.
+The data provided is split into a train (75%) a test (25%) partition and stored in two .tsv (tab-separated-values) files, respectively.<br>
+
+#### TARGET VARIABLE:- `Rating`
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -276,7 +278,7 @@ Note: The model's highest accuracy is approximately 50%. Further refinement thro
 
 <h2>Contributing Guidelines📑</h2>
 
-Read our [Contributing Guidelines](https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/blob/main/.github/CONTRIBUTING_GUIDELINES.md) to learn about our development process, how to propose bugfixes and improvements, and how to build to Music-Recommendation-System.
+Read our [Contributing Guidelines](https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/blob/main/.github/CONTRIBUTING_GUIDELINES.md) to learn about our development process, how to propose bugfixes and improvements, and how to build to ML-Project-Drug-Review-Dataset.
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
