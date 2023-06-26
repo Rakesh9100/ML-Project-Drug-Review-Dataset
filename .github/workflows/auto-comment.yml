@@ -1,0 +1,33 @@
+name: Auto Comment
+on:
+  issues:
+    types:
+      - opened
+      - closed
+      - assigned
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto Comment on Issues Opened
+        uses: wow-actions/auto-comment@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          issuesOpened: |
+            👋 Thank you for raising an issue! We will investigate and get back to you as soon as possible. @{{ author }}
+            Please make sure you have given as much context as possible and similar issue has not been opened before.
+
+      - name: Auto Comment on Issues Closed
+        uses: wow-actions/auto-comment@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          issuesClosed: |
+            👋 @{{ author }} This issue is closed. Thank You!!
+
+      - name: Auto Comment on Issues Assigned
+        uses: wow-actions/auto-comment@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          issuesAssigned: |
+            Hello @, This issue has been assigned to you 🙌. You can start working on it.
