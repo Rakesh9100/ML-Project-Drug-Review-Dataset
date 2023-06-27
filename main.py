@@ -17,6 +17,7 @@ from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
     ConfusionMatrixDisplay,
+    mean_absolute_error,
 )
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
