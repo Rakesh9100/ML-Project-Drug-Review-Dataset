@@ -427,7 +427,9 @@ plt.show()
 from sklearn.neural_network import MLPClassifier
 
 # Create an instance of the MLPClassifier model
-model = MLPClassifier(solver="lbfgs", alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
+model = MLPClassifier(
+    solver="lbfgs", alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1
+)
 
 # Fit the MLPClassifier model on the training data
 model.fit(X_train, Y_train)
@@ -1043,6 +1045,7 @@ print("Accuracy:", accuracy)
 
 # Calculate precision score
 from sklearn.metrics import precision_score
+
 print("Precision:", precision_score(y_test, y_pred, average="macro"))
 
 
