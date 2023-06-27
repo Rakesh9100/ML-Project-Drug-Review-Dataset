@@ -17,6 +17,7 @@ from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
     ConfusionMatrixDisplay,
+    mean_absolute_error
 )
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
@@ -1010,3 +1011,54 @@ plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
 plt.show()
+
+
+
+#Arima model
+from statsmodels.tsa.arima.model import ARIMA
+# Fit an ARIMA model
+model = ARIMA(Y_train, order=(1, 1, 1))
+model_fit = model.fit()
+
+# Make predictions on the test data
+arima_test = model_fit.forecast(steps=len(X_test))
+arima_train= model_fit.forecast(steps=len(X_train))
+
+# Evaluate the model
+mse_train= mean_squared_error(Y_train,arima_train)
+mse_test = mean_squared_error(Y_test, arima_test)
+r2_test = r2_score(Y_test, arima_test)
+r2_train =r2_score(Y_train,arima_train) 
+rmse_test = np.sqrt(mse_test)
+mae_test = mean_absolute_error(Y_test,arima_test)
+
+# Print evaluation metrics
+print("ARIMA RESULTS")
+print("Mean Squared train:", mse_train)
+print("R-squared train:", r2_test)
+print("Mean Squared test:", mse_test)
+print("R-squared test:", r2_test)
+print("rmse test:",rmse_test)
+print("mae test:",mae_test)
+
+plt.scatter(Y_train,arima_train)
+plt.xlabel("Actual")
+plt.ylabel("Predicted Arima")
+plt.title("ARima Model: Training data Scatter plot")
+# plt.show()
+plt.scatter(Y_test,arima_test)
+plt.xlabel("Actual")
+plt.ylabel("Predicted Arima")
+plt.title("ARima Model: Testing data Scatter plot")
+plt.show()
+# Plotting the scatter plot of predicted vs true values for both training and testing sets
+plt.figure(figsize=(8,6))
+plt.scatter(Y_train, arima_train, alpha=0.3, label='Training')
+plt.scatter(Y_test, arima_test, alpha=0.3, label='Testing')
+plt.plot([0,10], [0,10], linestyle='--', color='k', label='Perfect prediction')
+plt.xlabel('True Ratings')
+plt.ylabel('Predicted Ratings')
+plt.title('ARima model - Training and Testing Sets Scatter Plot')
+plt.legend()
+plt.show()
+
