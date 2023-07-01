@@ -6,6 +6,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 import catboost as cbt
 import optuna
 from sklearn.neural_network import MLPClassifier
@@ -1009,4 +1010,21 @@ plt.scatter(Y_train, cb_pred1)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
+plt.show()
+
+##### KNearest Neighbours Algorithm #####
+classifier= KNeighborsClassifier(n_neighbors=5, metric='minkowski', p=2 )
+classifier.fit(X_train, Y_train)
+train_pred = classifier.predict(X_train)
+test_pred = classifier.predict(X_test)
+
+train_accuracy = accuracy_score(train_pred, Y_train)
+test_accuracy = accuracy_score(test_pred, Y_test)
+print("\n KNearest Neighbour Metrics: \n")
+print("Accuracy for training: ", train_accuracy)
+print("Accuracy for testing: ", test_accuracy)
+
+# Plotting the confusion matrix
+ConfusionMatrixDisplay.from_estimator(classifier, X_test, Y_test)
+plt.title('KNearest Neighbours Confusion Matrix')
 plt.show()
