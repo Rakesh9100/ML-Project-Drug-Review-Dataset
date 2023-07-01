@@ -1013,7 +1013,7 @@ plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
 plt.show()
 
 ##### KNearest Neighbours Algorithm #####
-classifier= KNeighborsClassifier(n_neighbors=5, metric='minkowski', p=2 )
+classifier = KNeighborsClassifier(n_neighbors=5, metric="minkowski", p=2)
 classifier.fit(X_train, Y_train)
 train_pred = classifier.predict(X_train)
 test_pred = classifier.predict(X_test)
@@ -1026,5 +1026,5 @@ print("Accuracy for testing: ", test_accuracy)
 
 # Plotting the confusion matrix
 ConfusionMatrixDisplay.from_estimator(classifier, X_test, Y_test)
-plt.title('KNearest Neighbours Confusion Matrix')
+plt.title("KNearest Neighbours Confusion Matrix")
 plt.show()
