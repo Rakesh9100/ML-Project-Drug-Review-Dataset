@@ -285,6 +285,49 @@ test_imp[["rating"]] = test_imp[["rating"]].astype("float16")
 train_imp[["day", "month"]] = train_imp[["day", "month"]].astype("int8")
 test_imp[["day", "month"]] = test_imp[["day", "month"]].astype("int8")
 
+'''
+Implementation of pycaret on the Preprocessed data (given datasets)
+
+requirements: pip install pycaret
+
+Regression
+
+PyCaret’s Regression Module is a supervised machine learning module that is used for estimating the relationships between a dependent variable (often called the ‘outcome variable’, or ‘target’) and one or more independent variables (often called ‘features’, ‘predictors’, or ‘covariates’). 
+The objective of regression is to predict continuous values such as predicting sales amount, predicting quantity, predicting temperature, etc. 
+
+From line 297 to 325 depict the Implementation of Accuracy enhancement using multiple regression models at a time 
+'''
+#setup
+from pycaret.regression import *
+s = setup(train_imp, target = 'rating')
+#s = setup(test_imp, target = 'rating')
+
+#compare models
+best = compare_models()
+
+print(best)
+
+#analyze models
+evaluate_model(best)
+
+plot_model(best, plot = 'residuals')
+
+plot_model(best, plot = 'feature')
+
+#predictions
+predict_model(best)
+
+predictions = predict_model(best, data=train_df)
+predictions.head()
+
+#save the model
+save_model(best, 'my_best_pipeline')
+
+#load the saved model
+loaded_model = load_model('my_best_pipeline')
+print(loaded_model)
+
+
 # print(train_imp.iloc[:,:15].dtypes)
 # print(test_imp.iloc[:,:15].dtypes)
 
