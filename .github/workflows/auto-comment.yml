@@ -5,9 +5,6 @@ on:
       - opened
       - closed
       - assigned
-  pull_request:
-    types:
-      - opened
 
 jobs:
   run:
@@ -33,12 +30,4 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           issuesAssigned: |
-            Hello @{{ author }}, This issue has been assigned to you 🙌. You can start working on it.
-
-      - name: Auto Comment on Pull Request Opened
-        uses: wow-actions/auto-comment@v1
-        with:
-          GITHUB_TOKEN: ${{ secrets.PR_TOKEN }}
-          pullRequestOpened: |
-            Hello👋 @{{ author }}, Thank you for raising your pull request in this innovative project repo! 🎉
-            Please make sure you have followed our Contributing Guidelines. We will review it as soon as possible.
+            Hello @, This issue has been assigned to you 🙌. You can start working on it.
