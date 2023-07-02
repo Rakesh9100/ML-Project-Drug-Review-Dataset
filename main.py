@@ -22,6 +22,8 @@ from sklearn.preprocessing import LabelEncoder
 
 # Import LinearRegression and LogisticRegression for regression and classification
 from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+
 
 # Import catboost for gradient boosting
 import catboost as cbt
@@ -86,6 +88,7 @@ dtypes = {
 train_df = pd.read_csv(
     r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
 )
+
 
 # Sample a fraction (80%) of the training dataset with a random seed of 42
 train_df = train_df.sample(frac=0.8, random_state=42)
@@ -478,6 +481,7 @@ plt.show()
 predicted_ratings = line_test
 actual_ratings = Y_test
 
+
 # Convert decimal predictions to discrete values (1-10)
 rounded_predictions = np.round(predicted_ratings)
 
@@ -521,7 +525,6 @@ plt.title("Area Chart of Correct Predictions")
 plt.show()
 
 ##### ANN algorithm #####
-
 from sklearn.neural_network import MLPClassifier
 
 # Create an instance of the MLPClassifier model
@@ -1536,6 +1539,24 @@ plt.scatter(Y_train, cb_pred1)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
+plt.show()
+
+
+##### KNearest Neighbours Algorithm #####
+classifier = KNeighborsClassifier(n_neighbors=5, metric="minkowski", p=2)
+classifier.fit(X_train, Y_train)
+train_pred = classifier.predict(X_train)
+test_pred = classifier.predict(X_test)
+
+train_accuracy = accuracy_score(train_pred, Y_train)
+test_accuracy = accuracy_score(test_pred, Y_test)
+print("\n KNearest Neighbour Metrics: \n")
+print("Accuracy for training: ", train_accuracy)
+print("Accuracy for testing: ", test_accuracy)
+
+# Plotting the confusion matrix
+ConfusionMatrixDisplay.from_estimator(classifier, X_test, Y_test)
+plt.title("KNearest Neighbours Confusion Matrix")
 plt.show()
 
 
