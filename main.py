@@ -43,11 +43,11 @@ dtypes = {
     "usefulCount": "int16",
 }
 train_df = pd.read_csv(
-    r"/kaggle/input/kuc-hackathon-winter-2018/drugsComTrain_raw.csv", quoting=2, dtype=dtypes, on_bad_lines = "skip"
+    r"datasets\drugsComTrain_raw.tsv", quoting=2, dtype=dtypes, on_bad_lines = "skip"
 )
 train_df = train_df.sample(frac=0.8, random_state=42)
 test_df = pd.read_csv(
-    r"/kaggle/input/kuc-hackathon-winter-2018/drugsComTest_raw.csv", quoting=2, dtype=dtypes, on_bad_lines = "skip"
+    r"datasets\drugsComTest_raw.tsv", quoting=2, dtype=dtypes, on_bad_lines = "skip"
 )
 
 ## Converting date column to datetime format
