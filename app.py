@@ -17,7 +17,7 @@ def get_data_from_excel():
         "drugName": "category",
         "condition": "category",
         "review": "category",
-        "rating": "float16",
+        "rating": "float32",
         "date": "string",
         "usefulCount": "int16",
     }
@@ -51,7 +51,6 @@ def get_data_from_excel():
 
 
 def home(df):
-    st.title("Drug Review Analysis")
     # Add CSS style to center the title
     center_css ="""
         <style>
@@ -160,7 +159,6 @@ def home(df):
     # Rest of the code for the home page
 
 def admin(train_df,test_df,df):
-    st.title("Admin Panel")
     # Function to display data visualization
     def preprocess_data(train_df,test_df):
         X_train = train_df.drop("rating", axis=1)
@@ -206,7 +204,6 @@ def admin(train_df,test_df,df):
             st.pyplot()
 
     def display(train_df,test_df):
-        st.title('Data Visualization')
         # Display data description
         st.subheader('Data Description')
         st.write(df.describe())
