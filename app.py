@@ -24,14 +24,14 @@ def get_data_from_excel():
     chunk_size = 10000  # Define the size of each chunk
     train_chunks = []
     # Load the training dataset in chunks
-    for chunk in pd.read_csv(r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes,
+    for chunk in pd.read_csv(r"datasets/drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes,
                              chunksize=chunk_size):
         train_chunks.append(chunk)
     # Concatenate all the chunks to create the training dataframe
     train_df = pd.concat(train_chunks)
     test_chunks = []
     # Load the test dataset in chunks
-    for chunk in pd.read_csv(r"datasets\drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes, chunksize=chunk_size):
+    for chunk in pd.read_csv(r"datasets/drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes, chunksize=chunk_size):
         test_chunks.append(chunk)
     # Concatenate all the chunks to create the test dataframe
     test_df = pd.concat(test_chunks)
