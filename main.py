@@ -22,6 +22,8 @@ from sklearn.preprocessing import LabelEncoder
 
 # Import LinearRegression and LogisticRegression for regression and classification
 from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+
 
 # Import catboost for gradient boosting
 import catboost as cbt
@@ -86,6 +88,7 @@ dtypes = {
 train_df = pd.read_csv(
     r"datasets\drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes
 )
+
 
 # Sample a fraction (80%) of the training dataset with a random seed of 42
 train_df = train_df.sample(frac=0.8, random_state=42)
@@ -282,6 +285,50 @@ test_imp[["rating"]] = test_imp[["rating"]].astype("float16")
 train_imp[["day", "month"]] = train_imp[["day", "month"]].astype("int8")
 test_imp[["day", "month"]] = test_imp[["day", "month"]].astype("int8")
 
+"""
+Implementation of pycaret on the Preprocessed data (given datasets)
+
+requirements: pip install pycaret
+
+Regression
+
+PyCaret’s Regression Module is a supervised machine learning module that is used for estimating the relationships between a dependent variable (often called the ‘outcome variable’, or ‘target’) and one or more independent variables (often called ‘features’, ‘predictors’, or ‘covariates’). 
+The objective of regression is to predict continuous values such as predicting sales amount, predicting quantity, predicting temperature, etc. 
+
+From line 297 to 325 depict the Implementation of Accuracy enhancement using multiple regression models at a time 
+"""
+# setup
+from pycaret.regression import *
+
+s = setup(train_imp, target="rating")
+# s = setup(test_imp, target = 'rating')
+
+# compare models
+best = compare_models()
+
+print(best)
+
+# analyze models
+evaluate_model(best)
+
+plot_model(best, plot="residuals")
+
+plot_model(best, plot="feature")
+
+# predictions
+predict_model(best)
+
+predictions = predict_model(best, data=train_df)
+predictions.head()
+
+# save the model
+save_model(best, "my_best_pipeline")
+
+# load the saved model
+loaded_model = load_model("my_best_pipeline")
+print(loaded_model)
+
+
 # print(train_imp.iloc[:,:15].dtypes)
 # print(test_imp.iloc[:,:15].dtypes)
 
@@ -422,8 +469,106 @@ plt.ylabel("Residuals")
 plt.title("Linear Regression - Testing Data Residual Plot")
 plt.show()
 
-##### ANN algorithm #####
+for i in range(len(line_test)):
+    line_test[i] = line_test[i].round()
 
+# Pie Chart
+correct_predictions = sum(Y_test == line_test)
+incorrect_predictions = len(Y_test) - correct_predictions
+
+labels = ["Correct Predictions", "Incorrect Predictions"]
+sizes = [correct_predictions, incorrect_predictions]
+colors = ["green", "red"]
+plt.pie(sizes, labels=labels, colors=colors, autopct="%1.1f%%", startangle=90)
+
+plt.axis("equal")  # Equal aspect ratio ensures a circular pie chart
+plt.title("Prediction Accuracy")
+
+# Bar Chart
+prediction_column = "predicted_rating"
+target_column = "actual_rating"
+
+# Get the predicted ratings and actual ratings from the dataset
+predicted_ratings = line_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Count the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[actual_ratings == rounded_predictions], bins=bins
+)
+
+# Create the bar chart
+plt.bar(range(1, 11), correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Bar Chart of Correct Predictions")
+
+# Display the bar chart
+plt.show()
+
+# Histogram
+plt.hist(Y_test, bins="auto", alpha=0.5, color="blue", label="Actual")
+plt.hist(line_test, bins="auto", alpha=0.5, color="red", label="Predicted")
+
+plt.xlabel("Value")
+plt.ylabel("Frequency")
+plt.title("Actual vs Predicted Histogram")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Line Chart
+predicted_ratings = line_test
+actual_ratings = Y_test
+
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create a line chart for the number of correct predictions
+x = range(1, 11)
+
+plt.plot(x, correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Line Chart of Correct Predictions")
+plt.show()
+
+# Area Chart
+predicted_ratings = line_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create an area chart for the number of correct predictions
+x = range(1, 11)
+
+plt.fill_between(x, correct_predictions, color="blue", alpha=0.3)
+plt.plot(x, correct_predictions, color="blue", linewidth=2)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Area Chart of Correct Predictions")
+
+plt.show()
+
+##### ANN algorithm #####
 from sklearn.neural_network import MLPClassifier
 
 # Create an instance of the MLPClassifier model
@@ -778,6 +923,102 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot()
 plt.title("Logistic Regression Confusion Matrix")
 plt.show()
 
+# Pie Chart
+correct_predictions = sum(Y_test == logi_test)
+incorrect_predictions = len(Y_test) - correct_predictions
+
+labels = ["Correct Predictions", "Incorrect Predictions"]
+sizes = [correct_predictions, incorrect_predictions]
+colors = ["green", "red"]
+plt.pie(sizes, labels=labels, colors=colors, autopct="%1.1f%%", startangle=90)
+
+plt.axis("equal")  # Equal aspect ratio ensures a circular pie chart
+plt.title("Prediction Accuracy")
+plt.show()
+
+# Bar Chart
+prediction_column = "predicted_rating"
+target_column = "actual_rating"
+
+# Get the predicted ratings and actual ratings from the dataset
+predicted_ratings = logi_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Count the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[actual_ratings == rounded_predictions], bins=bins
+)
+
+# Create the bar chart
+plt.bar(range(1, 11), correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Bar Chart of Correct Predictions")
+
+# Display the bar chart
+plt.show()
+
+# Line Chart
+predicted_ratings = logi_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create a line chart for the number of correct predictions
+x = range(1, 11)
+
+plt.plot(x, correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Line Chart of Correct Predictions")
+plt.show()
+
+# Area Chart
+predicted_ratings = logi_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create an area chart for the number of correct predictions
+x = range(1, 11)
+
+plt.fill_between(x, correct_predictions, color="blue", alpha=0.3)
+plt.plot(x, correct_predictions, color="blue", linewidth=2)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Area Chart of Correct Predictions")
+
+plt.show()
+
+# Histogram
+plt.hist(Y_test, bins="auto", alpha=0.5, color="blue", label="Actual")
+plt.hist(logi_test, bins="auto", alpha=0.5, color="red", label="Predicted")
+
+plt.xlabel("Value")
+plt.ylabel("Frequency")
+plt.title("Actual vs Predicted Histogram")
+plt.legend()
+plt.grid(True)
+plt.show()
+
 ##### Perceptron Model classification algorithm #####
 
 
@@ -820,6 +1061,101 @@ plt.xlabel("Predicted")
 plt.ylabel("True")
 plt.show()
 
+# Pie Chart
+correct_predictions = sum(Y_test == mlpcls_test)
+incorrect_predictions = len(Y_test) - correct_predictions
+
+labels = ["Correct Predictions", "Incorrect Predictions"]
+sizes = [correct_predictions, incorrect_predictions]
+colors = ["green", "red"]
+plt.pie(sizes, labels=labels, colors=colors, autopct="%1.1f%%", startangle=90)
+
+plt.axis("equal")  # Equal aspect ratio ensures a circular pie chart
+plt.title("Prediction Accuracy")
+plt.show()
+
+# Bar Chart
+prediction_column = "predicted_rating"
+target_column = "actual_rating"
+
+# Get the predicted ratings and actual ratings from the dataset
+predicted_ratings = mlpcls_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Count the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[actual_ratings == rounded_predictions], bins=bins
+)
+
+# Create the bar chart
+plt.bar(range(1, 11), correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Bar Chart of Correct Predictions")
+
+# Display the bar chart
+plt.show()
+
+# Line Chart
+predicted_ratings = mlpcls_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create a line chart for the number of correct predictions
+x = range(1, 11)
+
+plt.plot(x, correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Line Chart of Correct Predictions")
+plt.show()
+
+# Area Chart
+predicted_ratings = mlpcls_test
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create an area chart for the number of correct predictions
+x = range(1, 11)
+
+plt.fill_between(x, correct_predictions, color="blue", alpha=0.3)
+plt.plot(x, correct_predictions, color="blue", linewidth=2)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Area Chart of Correct Predictions")
+plt.show()
+
+# Histogram
+plt.hist(Y_test, bins="auto", alpha=0.5, color="blue", label="Actual")
+plt.hist(mlpcls_test, bins="auto", alpha=0.5, color="red", label="Predicted")
+
+plt.xlabel("Value")
+plt.ylabel("Frequency")
+plt.title("Actual vs Predicted Histogram")
+plt.legend()
+plt.grid(True)
+plt.show()
+
 ##### Decision Tree Classifier algorithm #####
 
 dt = DecisionTreeClassifier(criterion="entropy", max_depth=5)
@@ -860,6 +1196,103 @@ ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=logi.classes_).plot(
 )
 plt.title("Decision Tree Classifier - Confusion Matrix")
 plt.show()
+
+# Pie Chart
+correct_predictions = sum(Y_test == test_pred)
+incorrect_predictions = len(Y_test) - correct_predictions
+
+labels = ["Correct Predictions", "Incorrect Predictions"]
+sizes = [correct_predictions, incorrect_predictions]
+colors = ["green", "red"]
+plt.pie(sizes, labels=labels, colors=colors, autopct="%1.1f%%", startangle=90)
+
+plt.axis("equal")  # Equal aspect ratio ensures a circular pie chart
+plt.title("Prediction Accuracy")
+plt.show()
+
+# Bar Chart
+prediction_column = "predicted_rating"
+target_column = "actual_rating"
+
+# Get the predicted ratings and actual ratings from the dataset
+predicted_ratings = test_pred
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Count the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[actual_ratings == rounded_predictions], bins=bins
+)
+
+# Create the bar chart
+plt.bar(range(1, 11), correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Bar Chart of Correct Predictions")
+
+# Display the bar chart
+plt.show()
+
+# Line Chart
+predicted_ratings = test_pred
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create a line chart for the number of correct predictions
+x = range(1, 11)
+
+plt.plot(x, correct_predictions)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Line Chart of Correct Predictions")
+plt.show()
+
+# Area Chart
+predicted_ratings = test_pred
+actual_ratings = Y_test
+
+# Convert decimal predictions to discrete values (1-10)
+rounded_predictions = np.round(predicted_ratings)
+
+# Calculate the number of correct predictions falling into each range
+bins = range(1, 12)
+correct_predictions, _ = np.histogram(
+    rounded_predictions[rounded_predictions == actual_ratings], bins=bins
+)
+
+# Create an area chart for the number of correct predictions
+x = range(1, 11)
+
+plt.fill_between(x, correct_predictions, color="blue", alpha=0.3)
+plt.plot(x, correct_predictions, color="blue", linewidth=2)
+plt.xlabel("Range")
+plt.ylabel("Count of Correct Predictions")
+plt.title("Area Chart of Correct Predictions")
+
+plt.show()
+
+# Histogram
+plt.hist(Y_test, bins="auto", alpha=0.5, color="blue", label="Actual")
+plt.hist(test_pred, bins="auto", alpha=0.5, color="red", label="Predicted")
+
+plt.xlabel("Value")
+plt.ylabel("Frequency")
+plt.title("Actual vs Predicted Histogram")
+plt.legend()
+plt.grid(True)
+plt.show()
+
 
 ##### Long Short-Term Memory algorithm #####
 
@@ -1150,6 +1583,24 @@ plt.scatter(Y_train, cb_pred1)
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.title("CatBoost Scatter Plot: Predicted vs Actual (Training Data)")
+plt.show()
+
+
+##### KNearest Neighbours Algorithm #####
+classifier = KNeighborsClassifier(n_neighbors=5, metric="minkowski", p=2)
+classifier.fit(X_train, Y_train)
+train_pred = classifier.predict(X_train)
+test_pred = classifier.predict(X_test)
+
+train_accuracy = accuracy_score(train_pred, Y_train)
+test_accuracy = accuracy_score(test_pred, Y_test)
+print("\n KNearest Neighbour Metrics: \n")
+print("Accuracy for training: ", train_accuracy)
+print("Accuracy for testing: ", test_accuracy)
+
+# Plotting the confusion matrix
+ConfusionMatrixDisplay.from_estimator(classifier, X_test, Y_test)
+plt.title("KNearest Neighbours Confusion Matrix")
 plt.show()
 
 
