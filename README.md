@@ -201,7 +201,7 @@ J[Step 4 : Applying 4 different ML models to find the best accuracy] --> K[Step 
   <em>Figure 2: Linear Regression - Training Data Scatter Plot</em>
 </p><br>
 <p align="center">
-  <img src="!https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/401999e4-deb0-4cb3-82d8-759c1d843085">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/401999e4-deb0-4cb3-82d8-759c1d843085">
   <br>
   <em>Figure 3: Linear Regression - Testing Data Scatter Plot</em>
 </p><br>
