@@ -185,29 +185,33 @@ J[Step 4 : Applying 4 different ML models to find the best accuracy] --> K[Step 
 
 <h2>Results Analysis Screenshots📈</h2>
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/73993775/232086090-f324bb79-f023-4922-a02f-330bd9bfd1ae.png">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/329e19a6-e995-4ccb-845d-5cc4bfc0f680">
+  <img src ="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/0cf7d839-6fdd-48af-9f2d-d407ca680562">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/323e60b4-ef17-43ed-9268-e94d62476d6e">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/91beb372-f986-4c9e-9289-08ee762bdb53">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/7952fbe2-34ed-40bb-8665-e1557c600bcf">
   <br>
   <em>Figure 1: Results of all the models</em>
 </p>
 
 <h3>A. Linear Regression</h3>
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/73993775/232078734-0e93dc9d-eed7-4c00-9148-801487cef5df.png">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/6bff6fd0-198b-415b-a7f0-77721d2654c2">
   <br>
   <em>Figure 2: Linear Regression - Training Data Scatter Plot</em>
 </p><br>
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/73993775/232082938-6cca0fed-171a-48af-83d5-974b7ebe0add.png">
+  <img src="!https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/401999e4-deb0-4cb3-82d8-759c1d843085">
   <br>
   <em>Figure 3: Linear Regression - Testing Data Scatter Plot</em>
 </p><br>
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/73993775/232082950-dde36ecf-5a95-4614-96e5-784afac59207.png">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/0c74a54a-6d42-4f25-9278-34f40a59d686">
   <br>
   <em>Figure 4: Linear regression - Training and Testing Sets Scatter Plot</em>
 </p><br>
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/73993775/232082956-3f8c3750-66f8-4941-ae52-e86dca0f2653.png">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/35f5d6b5-aa7c-4c5c-8c91-72323a0791fc">
   <br>
   <em>Figure 5: Linear Regression - Testing Data Residual Plot</em>
 </p>
