@@ -114,6 +114,28 @@ warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 warnings.simplefilter(action="ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
+#The dataset has been filtered into a more understandable format. Now let us try to understand the dataset a little better. 
+# Analysis of the most common conditions for which the drugs are consumed
+condition_counts = train_imp["condition"].value_counts()
+top_n_conditions = 10
+top_conditions = condition_counts[:top_n_conditions]
+
+# Pie chart of condition distribution
+plt.figure(figsize=(10, 6))
+plt.pie(condition_counts[:top_n_conditions], labels=top_conditions.index, autopct="%1.1f%%")
+plt.title(f"Condition Distribution: Top {top_n_conditions} Conditions")
+plt.show()
+
+# Analysis of the most consumed drugs
+drug_counts = train_imp["drugName"].value_counts()
+top_n_drugs = 10
+top_drugs = drug_counts[:top_n_drugs]
+
+# Pie chart of drug distribution
+plt.figure(figsize=(10, 6))
+plt.pie(drug_counts[:top_n_drugs], labels=top_drugs.index, autopct="%1.1f%%")
+plt.title(f"Drug Distribution: Top {top_n_drugs} Drugs")
+plt.show()
 
 ## Defining function to decode HTML-encoded characters
 def decode_html(text):
