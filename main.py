@@ -1658,3 +1658,58 @@ plt.xlabel("Predicted Ratings")
 plt.ylabel("Residuals")
 plt.title("ARima Model - Testing Data Residual Plot")
 plt.show()
+
+
+###Sentiment Analysis using DL
+
+
+# Function to seperate text and label
+def load_dataset(file_path, num_samples):
+    df = pd.read_csv(file_path, usecols=[3, 4], nrows=num_samples)
+    df.columns = ["review", "rating"]
+
+    text = df["review"].tolist()
+    text = [str(t).encode("ascii", "replace") for t in text]
+    text = np.array(text, dtype=object)[:]
+
+    labels = df["rating"].tolist()
+    labels = [1 if i >= 7 else 0 if i >= 5 else -1 for i in labels]
+    labels = np.array(pd.get_dummies(labels), dtype=int)[:]
+
+    return labels, text
+
+
+# Split into train and test dataset
+tmp_labels, tmp_text = load_dataset("datasets\drugsComTrain_raw.tsv", 568454)
+test_labels, test_text = load_dataset("datasets\drugsComTest_raw.tsv", 500000)
+
+# Make the model
+hub_layer = hub.KerasLayer(
+    "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1",
+    output_shape=[50],
+    input_shape=[],
+    dtype=tf.string,
+    name="input",
+    trainable=False,
+)
+model = tf.keras.Sequential()
+model.add(hub_layer)
+model.add(tf.keras.layers.Dense(1024, activation="relu"))
+model.add(tf.keras.layers.Dropout(0.2))
+model.add(tf.keras.layers.Dense(3, activation="softmax", name="output"))
+model.compile(loss="categorical_crossentropy", optimizer="Adam", metrics=["accuracy"])
+model.summary()
+
+# Fit the model
+print("Training the model ...")
+history = model.fit(
+    test_text,
+    test_labels,
+    batch_size=128,
+    epochs=50,
+    verbose=1,
+    validation_data=(test_text, test_labels),
+)
+
+# e.g. Predict some text
+model.predict(["im feeling sick"])
