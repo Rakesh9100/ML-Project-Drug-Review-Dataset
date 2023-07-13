@@ -288,6 +288,50 @@ test_imp[["rating"]] = test_imp[["rating"]].astype("float16")
 train_imp[["day", "month"]] = train_imp[["day", "month"]].astype("int8")
 test_imp[["day", "month"]] = test_imp[["day", "month"]].astype("int8")
 
+"""
+Implementation of pycaret on the Preprocessed data (given datasets)
+
+requirements: pip install pycaret
+
+Regression
+
+PyCaret’s Regression Module is a supervised machine learning module that is used for estimating the relationships between a dependent variable (often called the ‘outcome variable’, or ‘target’) and one or more independent variables (often called ‘features’, ‘predictors’, or ‘covariates’). 
+The objective of regression is to predict continuous values such as predicting sales amount, predicting quantity, predicting temperature, etc. 
+
+From line 297 to 325 depict the Implementation of Accuracy enhancement using multiple regression models at a time 
+"""
+# setup
+from pycaret.regression import *
+
+s = setup(train_imp, target="rating")
+# s = setup(test_imp, target = 'rating')
+
+# compare models
+best = compare_models()
+
+print(best)
+
+# analyze models
+evaluate_model(best)
+
+plot_model(best, plot="residuals")
+
+plot_model(best, plot="feature")
+
+# predictions
+predict_model(best)
+
+predictions = predict_model(best, data=train_df)
+predictions.head()
+
+# save the model
+save_model(best, "my_best_pipeline")
+
+# load the saved model
+loaded_model = load_model("my_best_pipeline")
+print(loaded_model)
+
+
 # print(train_imp.iloc[:,:15].dtypes)
 # print(test_imp.iloc[:,:15].dtypes)
 
@@ -1754,4 +1798,59 @@ plt.xlabel("Predicted Ratings")
 plt.ylabel("Residuals")
 plt.title("ARima Model - Testing Data Residual Plot")
 plt.show()
+
+
+
+###Sentiment Analysis using DL
+
+# Function to seperate text and label
+def load_dataset(file_path, num_samples):
+    df = pd.read_csv(file_path, usecols=[3, 4], nrows=num_samples)
+    df.columns = ["review", "rating"]
+
+    text = df["review"].tolist()
+    text = [str(t).encode("ascii", "replace") for t in text]
+    text = np.array(text, dtype=object)[:]
+
+    labels = df["rating"].tolist()
+    labels = [1 if i >= 7 else 0 if i >= 5 else -1 for i in labels]
+    labels = np.array(pd.get_dummies(labels), dtype=int)[:]
+
+    return labels, text
+
+
+# Split into train and test dataset
+tmp_labels, tmp_text = load_dataset("datasets\drugsComTrain_raw.tsv", 568454)
+test_labels, test_text = load_dataset("datasets\drugsComTest_raw.tsv", 500000)
+
+# Make the model
+hub_layer = hub.KerasLayer(
+    "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1",
+    output_shape=[50],
+    input_shape=[],
+    dtype=tf.string,
+    name="input",
+    trainable=False,
+)
+model = tf.keras.Sequential()
+model.add(hub_layer)
+model.add(tf.keras.layers.Dense(1024, activation="relu"))
+model.add(tf.keras.layers.Dropout(0.2))
+model.add(tf.keras.layers.Dense(3, activation="softmax", name="output"))
+model.compile(loss="categorical_crossentropy", optimizer="Adam", metrics=["accuracy"])
+model.summary()
+
+# Fit the model
+print("Training the model ...")
+history = model.fit(
+    test_text,
+    test_labels,
+    batch_size=128,
+    epochs=50,
+    verbose=1,
+    validation_data=(test_text, test_labels),
+)
+
+# e.g. Predict some text
+model.predict(["im feeling sick"])
 
