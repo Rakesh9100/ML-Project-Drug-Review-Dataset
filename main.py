@@ -1724,7 +1724,6 @@ m5.summary()
 ## Train the fifth type and plot the history
 h5 = train_model(m5, data_train, one_hot_labels)
 plot_history(h5)
-=======
 
 ##### KNearest Neighbours Algorithm #####
 classifier = KNeighborsClassifier(n_neighbors=5, metric="minkowski", p=2)
