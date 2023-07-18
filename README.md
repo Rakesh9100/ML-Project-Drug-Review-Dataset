@@ -185,7 +185,11 @@ J[Step 4 : Applying 4 different ML models to find the best accuracy] --> K[Step 
 
 <h2>Results Analysis Screenshots📈</h2>
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/73993775/232086090-f324bb79-f023-4922-a02f-330bd9bfd1ae.png">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/329e19a6-e995-4ccb-845d-5cc4bfc0f680">
+  <img src ="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/0cf7d839-6fdd-48af-9f2d-d407ca680562">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/323e60b4-ef17-43ed-9268-e94d62476d6e">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/91beb372-f986-4c9e-9289-08ee762bdb53">
+  <img src="https://github.com/Juhibhojani/ML-Project-Drug-Review-Dataset/assets/89679280/7952fbe2-34ed-40bb-8665-e1557c600bcf">
   <br>
   <em>Figure 1: Results of all the models</em>
 </p>
