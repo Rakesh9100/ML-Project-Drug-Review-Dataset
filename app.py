@@ -10,7 +10,9 @@ from sklearn.preprocessing import LabelEncoder
 
 
 warnings.filterwarnings("ignore")
-st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_option("deprecation.showPyplotGlobalUse", False)
+
+
 def get_data_from_excel():
     dtypes = {
         "Unnamed: 0": "int32",
@@ -24,14 +26,25 @@ def get_data_from_excel():
     chunk_size = 10000  # Define the size of each chunk
     train_chunks = []
     # Load the training dataset in chunks
-    for chunk in pd.read_csv(r"datasets/drugsComTrain_raw.tsv", sep="\t", quoting=2, dtype=dtypes,
-                             chunksize=chunk_size):
+    for chunk in pd.read_csv(
+        r"datasets/drugsComTrain_raw.tsv",
+        sep="\t",
+        quoting=2,
+        dtype=dtypes,
+        chunksize=chunk_size,
+    ):
         train_chunks.append(chunk)
     # Concatenate all the chunks to create the training dataframe
     train_df = pd.concat(train_chunks)
     test_chunks = []
     # Load the test dataset in chunks
-    for chunk in pd.read_csv(r"datasets/drugsComTest_raw.tsv", sep="\t", quoting=2, dtype=dtypes, chunksize=chunk_size):
+    for chunk in pd.read_csv(
+        r"datasets/drugsComTest_raw.tsv",
+        sep="\t",
+        quoting=2,
+        dtype=dtypes,
+        chunksize=chunk_size,
+    ):
         test_chunks.append(chunk)
     # Concatenate all the chunks to create the test dataframe
     test_df = pd.concat(test_chunks)
@@ -47,12 +60,12 @@ def get_data_from_excel():
         df["month"] = df["date"].dt.month.astype("int8")
         df["year"] = df["date"].dt.year.astype("int16")
 
-    return train_df,test_df,df
+    return train_df, test_df, df
 
 
 def home(df):
     # Add CSS style to center the title
-    center_css ="""
+    center_css = """
         <style>
         .title {
             text-align: center;
@@ -66,31 +79,33 @@ def home(df):
 
     def web_scraping(qs):
         try:
-            URL = 'https://www.drugs.com/' + qs + '.html'
+            URL = "https://www.drugs.com/" + qs + ".html"
             page = requests.get(URL)
-            soup = BeautifulSoup(page.content, 'html.parser')
-            title = soup.find('h2', id='uses').text
-            description = soup.find('h2', id='uses').find_next('p').text
-            warnings = soup.find('h2', id='warnings').find_next('strong').text
-            before_taking_title = soup.find('h2', id='before-taking').text
-            before_taking_items = soup.find('h2', id='before-taking').find_next('ul').find_all('li')
+            soup = BeautifulSoup(page.content, "html.parser")
+            title = soup.find("h2", id="uses").text
+            description = soup.find("h2", id="uses").find_next("p").text
+            warnings = soup.find("h2", id="warnings").find_next("strong").text
+            before_taking_title = soup.find("h2", id="before-taking").text
+            before_taking_items = (
+                soup.find("h2", id="before-taking").find_next("ul").find_all("li")
+            )
             before_taking_list = [item.text.strip() for item in before_taking_items]
 
             # Creating a dictionary with the extracted information
             result = {
-                'title': title,
-                'description': description,
-                'warnings': warnings,
-                'before_taking_title': before_taking_title,
-                'before_taking_list': before_taking_list
+                "title": title,
+                "description": description,
+                "warnings": warnings,
+                "before_taking_title": before_taking_title,
+                "before_taking_list": before_taking_list,
             }
 
             return result
 
         except requests.exceptions.HTTPError:
-            print('Page not found. Please check the input.')
+            print("Page not found. Please check the input.")
         except Exception as e:
-            print('An error occurred:', str(e))
+            print("An error occurred:", str(e))
 
     st.sidebar.header("Please Filter Here:")
     drug = st.sidebar.text_input("Enter the drug name")
@@ -98,7 +113,7 @@ def home(df):
     # Only display the dashboard if a drug name is entered
     if drug:
         review = st.sidebar.text_input("Enter your review")
-        drug=drug.title()
+        drug = drug.title()
         df_selection = df.query("drugName == @drug")
         df_selection.head()
         # ---- MAINPAGE ----
@@ -128,19 +143,19 @@ def home(df):
         scraped_data = web_scraping(drug.lower())
         if scraped_data:
             # Displaying the extracted information using Streamlit
-            st.subheader('Title')
-            st.write(scraped_data['title'])
-            st.subheader('Description')
-            st.write(scraped_data['description'])
+            st.subheader("Title")
+            st.write(scraped_data["title"])
+            st.subheader("Description")
+            st.write(scraped_data["description"])
 
-            st.subheader('Warnings')
-            st.write(scraped_data['warnings'])
+            st.subheader("Warnings")
+            st.write(scraped_data["warnings"])
 
-            st.subheader(scraped_data['before_taking_title'])
-            for item in scraped_data['before_taking_list']:
-                st.write('- ' + item)
+            st.subheader(scraped_data["before_taking_title"])
+            for item in scraped_data["before_taking_list"]:
+                st.write("- " + item)
         else:
-            st.error('Page not found. Please check the input.')
+            st.error("Page not found. Please check the input.")
 
         # Additional dashboard components and visualizations can be added here
     else:
@@ -158,9 +173,10 @@ def home(df):
     st.markdown(hide_st_style, unsafe_allow_html=True)
     # Rest of the code for the home page
 
-def admin(train_df,test_df,df):
+
+def admin(train_df, test_df, df):
     # Function to display data visualization
-    def preprocess_data(train_df,test_df):
+    def preprocess_data(train_df, test_df):
         X_train = train_df.drop("rating", axis=1)
         X_test = test_df.drop("rating", axis=1)
         Y_train = train_df["rating"]
@@ -168,7 +184,7 @@ def admin(train_df,test_df,df):
         # Set the column names to string type
         X_train.columns = X_train.columns.astype(str)
         X_test.columns = X_test.columns.astype(str)
-        return train_df,test_df,X_train,Y_train
+        return train_df, test_df, X_train, Y_train
 
     def visualize_data(train_df, test_df, X_train, Y_train):
         # Scatter Plot: Drug Name vs Ratings (Testing Data)
@@ -203,16 +219,17 @@ def admin(train_df,test_df,df):
         with col4:
             st.pyplot()
 
-    def display(train_df,test_df):
+    def display(train_df, test_df):
         # Display data description
-        st.subheader('Data Description')
+        st.subheader("Data Description")
         st.write(df.describe())
         # Display sample data
-        st.subheader('Sample Data')
+        st.subheader("Sample Data")
         st.write(df)
-        train_df, test_df, X_train, Y_train=preprocess_data(train_df,test_df)
+        train_df, test_df, X_train, Y_train = preprocess_data(train_df, test_df)
         visualize_data(train_df, test_df, X_train, Y_train)
-    display(train_df,test_df)
+
+    display(train_df, test_df)
 
 
 # Main function
@@ -220,7 +237,7 @@ def main():
     st.set_page_config(page_title="Drug Review Analysis", layout="wide")
     st.title("Drug Review Analysis")
 
-    train_df,test_df,df=get_data_from_excel()
+    train_df, test_df, df = get_data_from_excel()
     # Create a navigation bar for tab selection
     tab = st.radio(
         "Select Tab",
@@ -232,7 +249,8 @@ def main():
     if tab == "Home":
         home(df)
     elif tab == "Admin":
-        admin(train_df,test_df,df)
+        admin(train_df, test_df, df)
+
 
 if __name__ == "__main__":
     # st.set_page_config(page_title="Drugs Review", page_icon=":bar_chart:", layout="wide")

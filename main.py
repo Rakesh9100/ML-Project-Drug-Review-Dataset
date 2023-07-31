@@ -74,7 +74,16 @@ from keras.utils import pad_sequences
 
 # Import Sequential, Dense, LSTM, and Embedding for building neural network models
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, LSTM, GRU, Embedding, Conv1D, MaxPooling1D, GlobalMaxPooling1D
+from keras.layers import (
+    Dense,
+    Flatten,
+    LSTM,
+    GRU,
+    Embedding,
+    Conv1D,
+    MaxPooling1D,
+    GlobalMaxPooling1D,
+)
 
 # Define the data types for each column
 dtypes = {
@@ -89,7 +98,7 @@ dtypes = {
 
 # Read the training dataset from a TSV file, specifying the column separator as tab
 train_df = pd.read_csv(
-    r"datasets\drugsComTrain_raw.tsv", quoting=2, dtype=dtypes, on_bad_lines = "skip"
+    r"datasets\drugsComTrain_raw.tsv", quoting=2, dtype=dtypes, on_bad_lines="skip"
 )
 
 
@@ -98,7 +107,7 @@ train_df = train_df.sample(frac=0.8, random_state=42)
 
 # Read the testing dataset from a TSV file, specifying the column separator as tab
 test_df = pd.read_csv(
-    r"datasets\drugsComTest_raw.tsv", quoting=2, dtype=dtypes, on_bad_lines = "skip"
+    r"datasets\drugsComTest_raw.tsv", quoting=2, dtype=dtypes, on_bad_lines="skip"
 )
 
 # Convert the "date" column to datetime format in the training and testing datasets
@@ -1590,23 +1599,23 @@ plt.show()
 
 
 ## Creating labels
-new = train_df['rating']
-labels = -1*(new <= 4) + 1*(new >= 7)
-train_df['label'] = labels
+new = train_df["rating"]
+labels = -1 * (new <= 4) + 1 * (new >= 7)
+train_df["label"] = labels
 
 ## Check ratings to labels
-train_df.plot(x = 'rating', y = 'label', kind = 'scatter')
+train_df.plot(x="rating", y="label", kind="scatter")
 plt.show()
 
 ## Creating a new column review_length
-train_df['review_length'] = train_df['review'].apply(len)
-train_df['review_length'].describe()
+train_df["review_length"] = train_df["review"].apply(len)
+train_df["review_length"].describe()
 
 ## Creating a plot for distribution of review lengths
-train_df.hist('review_length', bins = np.arange(0, 1500, 100));
-plt.title('Distribution of review lengths')
-plt.xlabel('Review length')
-plt.ylabel('Count')
+train_df.hist("review_length", bins=np.arange(0, 1500, 100))
+plt.title("Distribution of review lengths")
+plt.xlabel("Review length")
+plt.ylabel("Count")
 plt.show()
 
 ## Converting reviews to padding sequences
@@ -1615,95 +1624,97 @@ LENGTH = 100
 N = 10000
 DEPTH = 32
 
-samples = train_df['review'].iloc[:N]
-tokenizer = Tokenizer(num_words = WORDS)
+samples = train_df["review"].iloc[:N]
+tokenizer = Tokenizer(num_words=WORDS)
 tokenizer.fit_on_texts(samples)
 sequences = tokenizer.texts_to_sequences(samples)
-data_train = pad_sequences(sequences, maxlen = LENGTH)
+data_train = pad_sequences(sequences, maxlen=LENGTH)
 
 ## Converting labels to one-hot-categorical values
-one_hot_labels = to_categorical(labels[:N], num_classes = 3)
+one_hot_labels = to_categorical(labels[:N], num_classes=3)
 
-## Checking the shape 
+## Checking the shape
 data_train.shape, one_hot_labels.shape
+
 
 ## Helper functions
 def plot_history(history):
-    
-    fs, ax = plt.subplots(1, 2, figsize = (16, 7))
-    
-    accuracy = history.history['acc']
-    val_accuracy = history.history['val_acc']
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
+    fs, ax = plt.subplots(1, 2, figsize=(16, 7))
+
+    accuracy = history.history["acc"]
+    val_accuracy = history.history["val_acc"]
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
 
     epochs = range(1, len(accuracy) + 1)
 
     plt.sca(ax[0])
-    plt.plot(epochs, accuracy, 'bo', label='Training Accuracy')
-    plt.plot(epochs, val_accuracy, 'b', label='Validation Accuracy')
-    plt.title('Training and Validation Accuracy')
+    plt.plot(epochs, accuracy, "bo", label="Training Accuracy")
+    plt.plot(epochs, val_accuracy, "b", label="Validation Accuracy")
+    plt.title("Training and Validation Accuracy")
     plt.legend()
 
     plt.sca(ax[1])
-    plt.plot(epochs, loss, 'bo', label='Training loss')
-    plt.plot(epochs, val_loss, 'b', label='Validation loss')
-    plt.title('Training and Validation loss')
+    plt.plot(epochs, loss, "bo", label="Training loss")
+    plt.plot(epochs, val_loss, "b", label="Validation loss")
+    plt.title("Training and Validation loss")
     plt.legend()
 
     plt.show()
 
+
 ## Creating a helper function for model training
-def train_model(model, x, y, e = 12, bs = 32, v = 1, vs = 0.25):
-    m = model.fit(x, y, epochs = e, batch_size = bs, verbose = v, validation_split = vs)
+def train_model(model, x, y, e=12, bs=32, v=1, vs=0.25):
+    m = model.fit(x, y, epochs=e, batch_size=bs, verbose=v, validation_split=vs)
     return m
+
 
 ## First type - Embedding and Flatten
 m1 = Sequential()
-m1.add(Embedding(WORDS, DEPTH, input_length = LENGTH)) 
+m1.add(Embedding(WORDS, DEPTH, input_length=LENGTH))
 m1.add(Flatten())
-m1.add(Dense(32, activation = 'relu'))
-m1.add(Dense(3, activation = 'softmax'))
-m1.compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy', metrics = ['acc'])
+m1.add(Dense(32, activation="relu"))
+m1.add(Dense(3, activation="softmax"))
+m1.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["acc"])
 m1.summary()
 
 # Train the first type and plot the history
 h1 = train_model(m1, data_train, one_hot_labels)
 plot_history(h1)
 
-# Second type - Embedding and LSTM 
+# Second type - Embedding and LSTM
 m2 = Sequential()
-m2.add(Embedding(WORDS, DEPTH, input_length = LENGTH))
+m2.add(Embedding(WORDS, DEPTH, input_length=LENGTH))
 m2.add(LSTM(DEPTH))
-m2.add(Dense(3, activation = 'softmax'))
-m2.compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy', metrics = ['acc'])
+m2.add(Dense(3, activation="softmax"))
+m2.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["acc"])
 m2.summary()
 
 # Train the second type and plot the history
 h2 = train_model(m2, data_train, one_hot_labels)
 plot_history(h2)
 
-## Third type - Embedding and GRU 
+## Third type - Embedding and GRU
 m3 = Sequential()
-m3.add(Embedding(WORDS, DEPTH, input_length = LENGTH))
+m3.add(Embedding(WORDS, DEPTH, input_length=LENGTH))
 m3.add(GRU(LENGTH))
-m3.add(Dense(3, activation = 'softmax'))
-m3.compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy', metrics = ['acc'])
+m3.add(Dense(3, activation="softmax"))
+m3.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["acc"])
 m3.summary()
 
 ## Train the third type and plot the history
 h3 = train_model(m3, data_train, one_hot_labels)
 plot_history(h3)
 
-## Fourth type - Embedding with Conv1D & MaxPooling1D 
+## Fourth type - Embedding with Conv1D & MaxPooling1D
 m4 = Sequential()
-m4.add(Embedding(WORDS, DEPTH, input_length = LENGTH))
-m4.add(Conv1D(DEPTH, 7, activation = 'relu'))
+m4.add(Embedding(WORDS, DEPTH, input_length=LENGTH))
+m4.add(Conv1D(DEPTH, 7, activation="relu"))
 m4.add(MaxPooling1D(5))
-m4.add(Conv1D(DEPTH, 7, activation = 'relu'))
+m4.add(Conv1D(DEPTH, 7, activation="relu"))
 m4.add(GlobalMaxPooling1D())
-m4.add(Dense(3, activation = 'softmax'))
-m4.compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy', metrics = ['acc'])
+m4.add(Dense(3, activation="softmax"))
+m4.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["acc"])
 m4.summary()
 
 ## Train the fourth type and plot the history
@@ -1712,13 +1723,13 @@ plot_history(h4)
 
 # Fifth type - Embedding with mixed Conv1D and GRU
 m5 = Sequential()
-m5.add(Embedding(WORDS, DEPTH, input_length = LENGTH))
-m5.add(Conv1D(DEPTH, 5, activation = 'relu'))
+m5.add(Embedding(WORDS, DEPTH, input_length=LENGTH))
+m5.add(Conv1D(DEPTH, 5, activation="relu"))
 m5.add(MaxPooling1D(5))
-m5.add(Conv1D(DEPTH, 7, activation = 'relu'))
-m5.add(GRU(DEPTH, dropout = 0.1, recurrent_dropout = 0.5))
-m5.add(Dense(3, activation = 'softmax'))
-m5.compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy', metrics = ['acc'])
+m5.add(Conv1D(DEPTH, 7, activation="relu"))
+m5.add(GRU(DEPTH, dropout=0.1, recurrent_dropout=0.5))
+m5.add(Dense(3, activation="softmax"))
+m5.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["acc"])
 m5.summary()
 
 ## Train the fifth type and plot the history
@@ -1799,8 +1810,8 @@ plt.title("ARima Model - Testing Data Residual Plot")
 plt.show()
 
 
+### Sentiment Analysis using DL
 
-###Sentiment Analysis using DL
 
 # Function to seperate text and label
 def load_dataset(file_path, num_samples):
@@ -1852,4 +1863,3 @@ history = model.fit(
 
 # e.g. Predict some text
 model.predict(["im feeling sick"])
-
