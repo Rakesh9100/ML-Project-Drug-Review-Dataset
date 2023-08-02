@@ -1863,3 +1863,24 @@ history = model.fit(
 
 # e.g. Predict some text
 model.predict(["im feeling sick"])
+
+
+# sarima
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+model = SARIMAX(Y_train, order=(1, 1, 3), seasonal_order=(1, 1, 2, 12))
+model_fit = model.fit()
+print(model_fit.summary())
+mean_actual = y.mean()
+# Predict future values
+forecasted_values1 = model_fit.predict(start=Y_test.index[0], end=Y_test.index[-1])
+tss1 = ((Y_test - mean_actual) ** 2).sum()
+rss1 = ((Y_test - forecasted_values1) ** 2).sum()
+r_squared1 = 1 - (rss1 / tss1)
+print("r2 value Sarima: ", r_squared1)
+print("MAE: ", mean_absolute_error(Y_test, forecasted_values1))
+print("MSE: ", mean_squared_error(Y_test, forecasted_values1))
+print("RMSE: ", np.sqrt(mean_squared_error(Y_test, forecasted_values1)))
+predictions = model_fit.predict()
+predictions.plot()
+plt.show()
