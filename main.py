@@ -24,9 +24,14 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 
-#import transformers for classifying drug reviews
+# import transformers for classifying drug reviews
 import torch
-from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification, Trainer, TrainingArguments
+from transformers import (
+    DistilBertTokenizerFast,
+    DistilBertForSequenceClassification,
+    Trainer,
+    TrainingArguments,
+)
 from sklearn import metrics
 
 # Import catboost for gradient boosting
@@ -386,19 +391,30 @@ plt.show()
 data = train_df[["review", "rating"]]  # the "review" and "rating" columns
 
 # A rating of 5 or more is considered towards the positive side according to dataset
-train_labels = torch.tensor([1 if rating >=5 else 0 for rating in data['rating']])
+train_labels = torch.tensor([1 if rating >= 5 else 0 for rating in data["rating"]])
 
 # Split the data into training, validation, and testing sets
-train_texts, temp_texts, train_labels, temp_labels = train_test_split(data['review'], train_labels, random_state=42, test_size=0.3)
-val_texts, test_texts, val_labels, test_labels = train_test_split(temp_texts, temp_labels, random_state=42, test_size=0.5)
+train_texts, temp_texts, train_labels, temp_labels = train_test_split(
+    data["review"], train_labels, random_state=42, test_size=0.3
+)
+val_texts, test_texts, val_labels, test_labels = train_test_split(
+    temp_texts, temp_labels, random_state=42, test_size=0.5
+)
 
 # Initialize the tokenizer
-tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-uncased")
 
 # Tokenize the data
-train_encodings = tokenizer(train_texts.tolist(), truncation=True, padding=True, max_length=256)
-val_encodings = tokenizer(val_texts.tolist(), truncation=True, padding=True, max_length=256)
-test_encodings = tokenizer(test_texts.tolist(), truncation=True, padding=True, max_length=256)
+train_encodings = tokenizer(
+    train_texts.tolist(), truncation=True, padding=True, max_length=256
+)
+val_encodings = tokenizer(
+    val_texts.tolist(), truncation=True, padding=True, max_length=256
+)
+test_encodings = tokenizer(
+    test_texts.tolist(), truncation=True, padding=True, max_length=256
+)
+
 
 # Prepare the data
 class DrugReviewsDataset(torch.utils.data.Dataset):
@@ -408,27 +424,32 @@ class DrugReviewsDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         item = {k: torch.tensor(v[idx]) for k, v in self.encodings.items()}
-        item["labels"] = torch.tensor(self.labels[idx])  # Use the modified labels directly
+        item["labels"] = torch.tensor(
+            self.labels[idx]
+        )  # Use the modified labels directly
         return item
 
     def __len__(self):
         return len(self.encodings["input_ids"])
+
 
 train_dataset = DrugReviewsDataset(train_encodings, train_labels)
 val_dataset = DrugReviewsDataset(val_encodings, val_labels)
 test_dataset = DrugReviewsDataset(test_encodings, test_labels)
 
 # Initialize the model
-model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=2)
+model = DistilBertForSequenceClassification.from_pretrained(
+    "distilbert-base-uncased", num_labels=2
+)
 
 training_args = TrainingArguments(
-    output_dir='./results',
+    output_dir="./results",
     num_train_epochs=3,
     per_device_train_batch_size=16,
     per_device_eval_batch_size=64,
     warmup_steps=500,
     weight_decay=0.01,
-    logging_dir='./logs',
+    logging_dir="./logs",
 )
 
 trainer = Trainer(
@@ -436,7 +457,7 @@ trainer = Trainer(
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=val_dataset,
-    compute_metrics=compute_metrics
+    compute_metrics=compute_metrics,
 )
 
 # Train the model
@@ -444,8 +465,8 @@ print("Training the model...")
 trainer.train()
 
 # Save the trained model and tokenizer
-model.save_pretrained('./save_model/')
-tokenizer.save_pretrained('./save_model/')
+model.save_pretrained("./save_model/")
+tokenizer.save_pretrained("./save_model/")
 
 # Evaluate the model on the test set
 print("Evaluating the model on the test set...")
@@ -454,8 +475,10 @@ for key, value in eval_result.items():
     print(f"{key}: {value}")
 
 # Test the model with new reviews
-new_reviews = ["What is wrong with these drugs? They gave me a ton of side effects.",
-               "I loved these, it cured all my acne"]
+new_reviews = [
+    "What is wrong with these drugs? They gave me a ton of side effects.",
+    "I loved these, it cured all my acne",
+]
 
 new_encodings = tokenizer(new_reviews, truncation=True, padding=True, max_length=256)
 new_dataset = DrugReviewsDataset(new_encodings, [0, 1])  # Dummy labels for testing
