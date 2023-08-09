@@ -1976,3 +1976,68 @@ history = model.fit(
 
 # e.g. Predict some text
 model.predict(["im feeling sick"])
+
+
+#other data visualizations
+
+#WE would be importing some libraries to understand our data and their relations 
+import missingno  as msno #used to visualize missing data in dataset
+import plotly.graph_objs as go #visually appealing graphing
+import plotly.express as px
+plt.style.context('grayscale')
+%matplotlib inline
+
+msno.bar(train_df, figsize=(16,7), color='blue')
+plt.xlabel("columns")
+plt.show()
+
+corr=train_df.corr()
+plt.figure(figsize=(16,10))
+sns.heatmap(corr, cmap='copper',annot=True)
+plt.show()
+
+train_df.groupby("rating")["usefulCount"].sum()
+train_df.pivot_table(values="usefulCount",index="rating")
+train_df.rating.value_counts()
+
+fig=px.histogram(train_df,x="rating",color="rating",nbins=30,opacity=0.8 ,pattern_shape="rating",
+                 pattern_shape_sequence=['.',"x","+","\\","|"], title= "Ratings Histogram Plot")
+
+fig.update_layout(bargap=0.3, font_size=15,font_color="red")
+fig.show()
+
+sns.catplot(data=train_df,kind="bar",x="rating",y="usefulCount",palette="cool")
+plt.show()
+
+condition_counts=train_df['condition'].value_counts()
+top10_conditions=condition_counts[:10]
+colors=['purple','lightblue','pink','lightgreen']
+explode=[2.0]*len(top10_conditions)
+plt.pie(top10_conditions.values,labels=top10_conditions.index,autopct='%1.1f%%',colors=colors)
+plt.title('Top 10 Medical Conditions distribution in the Training Dataset')
+
+
+drugName_counts=train_df['drugName'].value_counts()
+top10_medicine=drugName_counts[:10]
+colors=['purple','lightblue','pink','lightgreen']
+explode=[2.0]*len(top10_medicine)
+plt.pie(top10_medicine.values,labels=top10_medicine.index,autopct='%1.1f%%',colors=colors)
+plt.title('Top 10 Medicinal Drugs distribution in the Training Dataset')
+
+top10_ratings=df.groupby('drugName')['rating'].mean().loc[top10_medicine.index]
+
+plt.bar(top10_medicine.index,top10_ratings,color="lightblue")
+plt.xlabel('Top 10 MEDICINE')
+plt.ylabel('Rating')
+plt.title('Ratings of top 10 medicines')
+plt.xticks(rotation=45,ha='right')
+plt.tight_layout()
+plt.show()
+
+plt.bar(top10_medicine.index,top10_conditions,color="pink")
+plt.xlabel('Top 10 MEDICINE')
+plt.ylabel('condition')
+plt.title('medicine and condition of top 10 medicines')
+plt.xticks(rotation=45,ha='right')
+plt.tight_layout()
+plt.show()
