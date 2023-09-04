@@ -8,5 +8,5 @@ seaborn==0.12.2
 gensim==4.3.2
 xgboost==1.7.6
 pycaret==3.0.4
-catboost==1.2
+catboost==1.2.1
 optuna==3.3.0
