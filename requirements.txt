@@ -1,5 +1,5 @@
 beautifulsoup4==4.12.2
-black==23.7.0
+black==23.9.1
 matplotlib==3.7.2
 numpy==1.25.2
 pandas==2.1.0
