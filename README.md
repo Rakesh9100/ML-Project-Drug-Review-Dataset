@@ -289,6 +289,18 @@ Read our [Contributing Guidelines](https://github.com/Rakesh9100/ML-Project-Drug
 <h2>Code Of Conduct📑</h2>
 
 This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/blob/main/.github/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+<h2>This repo has been part of the following Open Source Programs🥳</h2>
+
+<table>
+<tr>
+<td align="center">
+<a href="https://gssoc.girlscript.tech/"><img src="https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/assets/73993775/af63acb8-c32a-4ff6-9470-ea92fb782e78" height="140px" width="140px" alt="GSSOC2023"></a><br><sub><b>GSSoC 2k23</b></sub>
+</td>
+</tr>
+</table>
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -305,7 +317,7 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
-<h2>Project Contributors⚡</h2>
+<h2>Project Contributors🫂</h2>
 
 <a href="https://github.com/Rakesh9100/ML-Project-Drug-Review-Dataset/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Rakesh9100/ML-Project-Drug-Review-Dataset" />
