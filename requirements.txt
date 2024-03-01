@@ -3,7 +3,7 @@ black==24.2.0
 matplotlib==3.8.2
 numpy==1.26.3
 pandas==2.2.0
-scikit-learn==1.4.0
+scikit-learn==1.4.1.post1
 seaborn==0.13.2
 gensim==4.3.2
 xgboost==2.0.3
