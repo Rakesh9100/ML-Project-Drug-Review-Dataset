@@ -1,6 +1,6 @@
 beautifulsoup4==4.12.3
 black==24.2.0
-matplotlib==3.8.2
+matplotlib==3.8.3
 numpy==1.26.3
 pandas==2.2.0
 scikit-learn==1.4.1.post1
