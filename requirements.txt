@@ -1,4 +1,4 @@
-beautifulsoup4==4.12.2
+beautifulsoup4==4.12.3
 black==24.2.0
 matplotlib==3.8.2
 numpy==1.26.3
