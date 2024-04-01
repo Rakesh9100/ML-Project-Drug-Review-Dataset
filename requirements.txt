@@ -9,4 +9,4 @@ gensim==4.3.2
 xgboost==2.0.3
 pycaret==3.3.0
 catboost==1.2.3
-optuna==3.5.0
+optuna==3.6.1
