@@ -990,6 +990,7 @@ param = [
 ]
 
 logi = LogisticRegression()
+from sklearn.model_selection import GridSearchCV
 gs_logi = GridSearchCV(logi, param, cv=2, n_jobs=-1, verbose=1)
 gs_logi.fit(X_train, Y_train)
 logi_train = gs_logi.predict(X_train)
