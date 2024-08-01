@@ -1,7 +1,7 @@
 beautifulsoup4==4.12.3
 black==24.4.2
 matplotlib==3.9.0
-numpy==2.0.0
+numpy==2.0.1
 pandas==2.2.2
 scikit-learn==1.5.0
 seaborn==0.13.2
