@@ -5,7 +5,7 @@ numpy==2.0.1
 pandas==2.2.2
 scikit-learn==1.5.1
 seaborn==0.13.2
-gensim==4.3.2
+gensim==4.3.3
 xgboost==2.1.1
 pycaret==3.3.2
 catboost==1.2.5
