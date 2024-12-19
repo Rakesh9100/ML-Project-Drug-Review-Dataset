@@ -73,7 +73,7 @@ def home(df):
         """
     st.markdown(center_css, unsafe_allow_html=True)
     # Add header image
-    header_image = "https://pink.pharmaintelligence.informa.com/-/media/editorial/pink-sheet/00_regular-column-images/drugreviewprofile_1200x675.jpg?rev=64d4d3dd70c547e5852a54c721ad553c&w=790&hash=4B5DD4FA49DAC3A70E3CFA4D1F526FE8"  # Replace with the path to your image
+    header_image = "https://wisdomml.in/wp-content/uploads/2023/03/drug.png"  # Replace with the path to your image
     st.image(header_image, use_container_width=True)
 
     def web_scraping(qs):
