@@ -197,9 +197,9 @@ def admin(train_df, test_df, df):
         # Scatter Matrix for training dataset
         feature_columns = ["drugName", "condition", "rating", "usefulCount"]
         st.subheader("Scatter Matrix For Training Dataset")
-        plt.figure(figsize=(8, 6))  # Adjust the figsize as needed
-        sns.pairplot(train_df[feature_columns])
-        st.pyplot()
+        fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figsize as needed
+        pairplot_fig = sns.pairplot(train_df[feature_columns])
+        st.pyplot(pairplot_fig.figure)
 
         histogram_drugname = plt.hist(train_df["drugName"], bins=50)
         plt.xlabel("Bins")
@@ -213,10 +213,10 @@ def admin(train_df, test_df, df):
 
         # Box Plot of Rating
         st.subheader("Box Plot of Rating")
-        plt.figure(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(10, 6))  # Adjust the figsize as needed
         sns.boxplot(x="rating", data=train_df)
         with col4:
-            st.pyplot()
+            st.pyplot(fig)
 
     def display(train_df, test_df):
         # Display data description
